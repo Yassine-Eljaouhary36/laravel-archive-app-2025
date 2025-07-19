@@ -50,4 +50,9 @@ class User extends Authenticatable
     {
         return $this->hasRole('admin'); // Using spatie/laravel-permission
     }
+
+    public function boxes()
+    {
+        return $this->hasMany(Box::class);
+    }
 }

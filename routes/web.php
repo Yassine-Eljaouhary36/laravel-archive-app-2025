@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\BoxController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -25,8 +26,22 @@ Route::get('/dashboard', function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    // Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    // Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Box routes
+    Route::prefix('boxes')->group(function () {
+        Route::get('/', [BoxController::class, 'index'])->name('boxes.index');
+        Route::get('/create', [BoxController::class, 'create'])->name('boxes.create');
+        Route::post('/', [BoxController::class, 'store'])->name('boxes.store');
+        Route::get('/{box}', [BoxController::class, 'show'])->name('boxes.show');
+        
+        // Optional routes you might need later
+        Route::get('/{box}/edit', [BoxController::class, 'edit'])->name('boxes.edit');
+        Route::put('/{box}', [BoxController::class, 'update'])->name('boxes.update');
+        Route::delete('/{box}', [BoxController::class, 'destroy'])->name('boxes.destroy');
+        
+    });
 });
 
 // Admin routes
@@ -44,6 +59,9 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
 // Controller routes
 Route::prefix('controller')->middleware(['auth', 'role:controller'])->group(function () {
     Route::get('users', [UserController::class, 'index'])->name('controller.users.index');
-});
+    // In routes/web.php
+    Route::post('/boxes/{box}/validate', [BoxController::class, 'validateBox'])
+        ->name('boxes.validate');
+    });
 
 require __DIR__.'/auth.php';

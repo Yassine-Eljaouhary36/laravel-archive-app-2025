@@ -1,64 +1,45 @@
-<section>
-    <header>
-        <h2 class="text-lg font-medium text-gray-900">
-            {{ __('Profile Information') }}
+<section class="bg-white p-6 rounded-xl shadow-md">
+    <header class="mb-6 text-right">
+        <h2 class="text-xl font-semibold text-gray-800">
+            {{ __('معلومات الحساب') }}
         </h2>
-
-        <p class="mt-1 text-sm text-gray-600">
-            {{ __("Update your account's profile information and email address.") }}
+        <p class="text-sm text-gray-500">
+            {{ __('هذه معلومات حسابك الشخصية.') }}
         </p>
     </header>
 
-    <form id="send-verification" method="post" action="{{ route('verification.send') }}">
-        @csrf
-    </form>
-
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6">
-        @csrf
-        @method('patch')
-
+    <div class="space-y-5 text-right">
         <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $user->name)" required autofocus autocomplete="name" />
-            <x-input-error class="mt-2" :messages="$errors->get('name')" />
+            <label class="block text-sm font-medium text-gray-600">
+                {{ __('الاسم الكامل') }}
+            </label>
+            <div class="mt-1 text-base text-gray-900 border p-2 rounded-md bg-gray-50">
+                {{ $user->name }}
+            </div>
         </div>
 
         <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)" required autocomplete="username" />
-            <x-input-error class="mt-2" :messages="$errors->get('email')" />
+            <label class="block text-sm font-medium text-gray-600">
+                {{ __('البريد الإلكتروني') }}
+            </label>
+            <div class="mt-1 text-base text-gray-900 border p-2 rounded-md bg-gray-50">
+                {{ $user->email }}
+            </div>
 
             @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
-                <div>
-                    <p class="text-sm mt-2 text-gray-800">
-                        {{ __('Your email address is unverified.') }}
-
-                        <button form="send-verification" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            {{ __('Click here to re-send the verification email.') }}
-                        </button>
-                    </p>
-
-                    @if (session('status') === 'verification-link-sent')
-                        <p class="mt-2 font-medium text-sm text-green-600">
-                            {{ __('A new verification link has been sent to your email address.') }}
-                        </p>
-                    @endif
+                <div class="mt-2 text-sm text-red-600">
+                    {{ __('بريدك الإلكتروني غير مؤكد.') }}
                 </div>
             @endif
         </div>
 
-        <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Save') }}</x-primary-button>
-
-            @if (session('status') === 'profile-updated')
-                <p
-                    x-data="{ show: true }"
-                    x-show="show"
-                    x-transition
-                    x-init="setTimeout(() => show = false, 2000)"
-                    class="text-sm text-gray-600"
-                >{{ __('Saved.') }}</p>
-            @endif
+        <div>
+            <label class="block text-sm font-medium text-gray-600">
+                {{ __('الدور') }}
+            </label>
+            <div class="mt-1 text-base text-gray-900 border p-2 rounded-md bg-gray-50">
+                {{ $user->getRoleNames()->first() ?? '—' }}
+            </div>
         </div>
-    </form>
+    </div>
 </section>
