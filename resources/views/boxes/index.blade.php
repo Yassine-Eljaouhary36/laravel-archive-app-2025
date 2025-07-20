@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Box Management') }}
+            {{ __('إدارة العلب') }}
         </h2>
     </x-slot>
 
@@ -70,14 +70,15 @@
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{__('رقم الصندوق')}}</th>
+                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{__('رقم العلبة')}}</th>
                                     <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{__('رقم قاعدة الحفظ')}}</th>
-                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{__('نوع الملفات')}}</th>
+                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{__('المصلحة')}}</th>
                                     <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{__('سنة الحكم')}}</th>
                                     <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{__('عدد الملفات')}}</th>
                                     @if(auth()->user()->hasRole(['admin', 'controller']))
                                         <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{__('المستخدم')}}</th>
                                     @endif
+                                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">{{__('تم التحقق ')}}</th>
                                     <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
                                 </tr>
                             </thead>
@@ -92,6 +93,21 @@
                                     @if(auth()->user()->hasRole(['admin', 'controller']))
                                         <td>{{ $box->user->name ?? 'System' }}</td>
                                     @endif
+                                    <td  class="text-center">
+                                        @if($box->isValidated())
+                                            <span class="inline-flex items-center justify-center h-5 w-5 rounded-full bg-green-100">
+                                                <svg class="h-2 w-2 text-green-600" fill="currentColor" viewBox="0 0 8 8">
+                                                    <circle cx="4" cy="4" r="3" />
+                                                </svg>
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center justify-center h-5 w-5 rounded-full bg-red-100">
+                                                <svg class="h-2 w-2 text-red-600" fill="currentColor" viewBox="0 0 8 8">
+                                                    <circle cx="4" cy="4" r="3" />
+                                                </svg>
+                                            </span>
+                                        @endif
+                                    </td>
                                     <td class="px-6 py-4 whitespace-nowrap" style="display: flex">
                                         <a href="{{ route('boxes.show', $box->id) }}" class="text-blue-500 hover:text-blue-700 mr-2" title="عرض">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -100,12 +116,14 @@
                                             </svg>
                                         </a>
 
+                                        @can('update', $box)
                                         <!-- Edit Icon -->
                                         <a style="margin-right: 20px" href="{{ route('boxes.edit', $box->id) }}" class="text-yellow-500 hover:text-yellow-700" title="تعديل">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                             </svg>
                                         </a>
+                                        @endcan
                                     </td>
                                 </tr>
                                 @endforeach

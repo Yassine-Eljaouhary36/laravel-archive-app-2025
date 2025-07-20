@@ -25,6 +25,14 @@
                     </x-nav-link>
                 @endif
 
+                @if(Auth::check())
+                    <x-nav-link :href="route('boxes.index')" :active="request()->routeIs('boxes.index')">
+                        <x-heroicon-s-archive-box class="ml-2 mr-2 h-5 w-5 inline" />
+
+                        {{ __('إدارة العلب') }}
+                    </x-nav-link>
+                @endif
+
             </div>
 
             <!-- Settings Dropdown -->

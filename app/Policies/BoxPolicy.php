@@ -18,4 +18,9 @@ class BoxPolicy
     {
         return !$box->isValidated() && ($user->hasRole('admin') || $box->user_id == $user->id);
     }
+
+    public function show(User $user, Box $box)
+    {
+        return ($user->hasRole('admin') || $user->hasRole('controller')|| $box->user_id == $user->id);
+    }
 }

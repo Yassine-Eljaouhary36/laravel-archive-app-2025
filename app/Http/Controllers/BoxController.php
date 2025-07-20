@@ -83,6 +83,7 @@ class BoxController extends Controller
 
     public function show(Box $box)
     {
+        $this->authorize('show', $box);
         $files = $box->files()
                 ->select('id', 'box_id', 'file_number', 'symbol', 'year_of_opening', 'judgment_number', 'judgment_date')
                 ->paginate(10);
@@ -93,6 +94,7 @@ class BoxController extends Controller
     
     public function edit(Box $box)
     {
+        $this->authorize('update', $box);
         if ($box->isValidated()) {
             abort(403, 'Validated boxes cannot be modified');
         }
@@ -103,6 +105,7 @@ class BoxController extends Controller
 
     public function update(Request $request, Box $box)
     {
+        $this->authorize('update', $box);
         if ($box->isValidated()) {
             abort(403, 'Validated boxes cannot be modified');
         }

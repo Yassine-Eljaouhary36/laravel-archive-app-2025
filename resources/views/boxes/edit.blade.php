@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Edit Box') }}
+           {{ __('تعديل الصندوق') }}
         </h2>
     </x-slot>
 
@@ -15,11 +15,15 @@
                         
                         <!-- Box Information Section -->
                         <div class="mb-6 p-4 border rounded-lg">
-                            <h3 class="text-lg font-medium text-gray-900 mb-4">{{ __('Box Information') }}</h3>
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">
+                                <x-heroicon-s-archive-box class="ml-2 mr-2 h-5 w-5 inline" />
+                                {{ __('معلومات العلبة') }} : 
+                                <span class="px-4 py-2 bg-blue-200 text-black-800 rounded-lg">{{$box->box_number}}</span>
+                            </h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <!-- Saving Base Number -->
                                 <div>
-                                    <x-input-label for="saving_base_number" :value="__('Saving Base Number')" />
+                                    <x-input-label for="saving_base_number" :value="__('رقم قاعدة الحفظ')" />
                                     <x-text-input id="saving_base_number" class="block mt-1 w-full" type="text" 
                                         name="saving_base_number" :value="old('saving_base_number', $box->saving_base_number)" required />
                                     <x-input-error :messages="$errors->get('saving_base_number')" class="mt-2" />
@@ -27,15 +31,19 @@
                                 
                                 <!-- File Type -->
                                 <div>
-                                    <x-input-label for="file_type" :value="__('File Type')" />
-                                    <x-text-input id="file_type" class="block mt-1 w-full" type="text" 
-                                        name="file_type" :value="old('file_type', $box->file_type)" required />
+                                    <x-input-label for="file_type" :value="__('المصلحة')" />
+                                    <select id="file_type" name="file_type" class="block mt-1 w-full rounded-lg" required>
+                                        <option value="">{{ __('حدد المصلحة') }}</option>
+                                        <option value="الرئاسة" {{ old('file_type', $box->file_type) == 'الرئاسة' ? 'selected' : '' }}>الرئاسة</option>
+                                        <option value="النيابة العامة" {{ old('file_type', $box->file_type) == 'النيابة العامة' ? 'selected' : '' }}>النيابة العامة</option>
+                                    </select>
                                     <x-input-error :messages="$errors->get('file_type')" class="mt-2" />
                                 </div>
+
                                 
                                 <!-- Year of Judgment -->
                                 <div>
-                                    <x-input-label for="year_of_judgment" :value="__('Year of Judgment')" />
+                                    <x-input-label for="year_of_judgment" :value="__('سنة الحكم')" />
                                     <x-text-input id="year_of_judgment" class="block mt-1 w-full" type="number" 
                                         name="year_of_judgment" :value="old('year_of_judgment', $box->year_of_judgment)" required />
                                     <x-input-error :messages="$errors->get('year_of_judgment')" class="mt-2" />
@@ -46,16 +54,16 @@
                         <!-- Files Section -->
                         <div class="mb-6 p-4 border rounded-lg">
                             <div class="flex justify-between items-center mb-4">
-                                <h3 class="text-lg font-medium text-gray-900">{{ __('Files') }}</h3>
+                                <h3 class="text-lg font-medium text-gray-900">{{ __('الملفات') }}</h3>
                                 <x-primary-button type="button" id="addFileBtn" onclick="showFileForm()">
-                                    {{ __('Add New File') }}
+                                    {{ __('إضافة ملف جديد') }}
                                 </x-primary-button>
                             </div>
 
                             <!-- File Form (Initially hidden) -->
                             <div id="fileFormContainer" class="hidden mb-6 p-4 border rounded-lg bg-gray-50">
                                 <div class="flex justify-between items-center mb-4">
-                                    <h4 class="text-md font-medium text-gray-900" id="fileFormTitle">{{ __('Add New File') }}</h4>
+                                    <h4 class="text-md font-medium text-gray-900" id="fileFormTitle">{{ __('إضافة ملف جديد') }}</h4>
                                     <button type="button" onclick="hideFileForm()" class="text-gray-500 hover:text-gray-700">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -66,19 +74,19 @@
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                     <!-- File Number -->
                                     <div>
-                                        <x-input-label for="file_number" :value="__('File Number')" />
+                                        <x-input-label for="file_number" :value="__('رقم الملف')" />
                                         <x-text-input id="file_number" class="block mt-1 w-full" type="text" name="file_number" />
                                     </div>
                                     
                                     <!-- Symbol -->
                                     <div>
-                                        <x-input-label for="symbol" :value="__('Symbol')" />
+                                        <x-input-label for="symbol" :value="__('رمز الملف')" />
                                         <x-text-input id="symbol" class="block mt-1 w-full" type="text" name="symbol" />
                                     </div>
                                     
                                     <!-- Year of Opening -->
                                     <div>
-                                        <x-input-label for="year_of_opening" :value="__('Year of Opening')" />
+                                        <x-input-label for="year_of_opening" :value="__('سنة فتح الملف')" />
                                         <x-text-input id="year_of_opening" class="block mt-1 w-full" type="number" name="year_of_opening" />
                                     </div>
                                 </div>
@@ -86,24 +94,24 @@
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
                                     <!-- Judgment Number -->
                                     <div>
-                                        <x-input-label for="judgment_number" :value="__('Judgment Number')" />
+                                        <x-input-label for="judgment_number" :value="__('رقم الحكم')" />
                                         <x-text-input id="judgment_number" class="block mt-1 w-full" type="text" name="judgment_number" />
                                     </div>
                                     
                                     <!-- Judgment Date -->
                                     <div>
-                                        <x-input-label for="judgment_date" :value="__('Judgment Date')" />
+                                        <x-input-label for="judgment_date" :value="__('تاريخ الحكم')" />
                                         <x-text-input id="judgment_date" class="block mt-1 w-full" type="date" name="judgment_date" />
                                     </div>
                                 </div>
                                 
                                 <div class="flex items-center justify-end mt-6">
                                     <x-secondary-button type="button" onclick="hideFileForm()" class="ml-3">
-                                        {{ __('Cancel') }}
+                                         {{ __('إلغاء') }}
                                     </x-secondary-button>
                                     
                                     <x-primary-button type="button" onclick="saveFile()" class="ml-3">
-                                        {{ __('Save File') }}
+                                        {{ __('حفظ ') }}
                                     </x-primary-button>
                                 </div>
                             </div>
@@ -113,12 +121,12 @@
                                 <table class="min-w-full divide-y divide-gray-200">
                                     <thead class="bg-gray-50">
                                         <tr>
-                                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('File Number') }}</th>
-                                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Symbol') }}</th>
-                                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Year of Opening') }}</th>
-                                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Judgment Number') }}</th>
-                                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Judgment Date') }}</th>
-                                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Actions') }}</th>
+                                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('رقم الملف') }}</th>
+                                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('رمز الملف') }}</th>
+                                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('سنة فتح الملف') }}</th>
+                                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('رقم الحكم') }}</th>
+                                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('تاريخ الحكم') }}</th>
+                                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
                                         </tr>
                                     </thead>
                                     <tbody id="filesTableBody" class="bg-white divide-y divide-gray-200">
@@ -141,12 +149,12 @@
                         </div>
                         
                         <div class="flex items-center justify-end mt-6">
-                            <a href="{{ route('boxes.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-600 focus:bg-gray-600 active:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                                {{ __('Cancel') }}
+                            <a href="{{ route('boxes.index') }}" class="inline-flex items-center px-4 py-2 bg-red-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-600 focus:bg-gray-600 active:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                {{ __('إلغاء') }} 
                             </a>
-                            
-                            <x-primary-button class="ml-3">
-                                {{ __('Update Box') }}
+                                        
+                            <x-primary-button class="mr-3" style="background-color: rgb(255, 138, 20)">
+                                {{ __('حفظ التعديلات') }}
                             </x-primary-button>
                         </div>
                     </form>

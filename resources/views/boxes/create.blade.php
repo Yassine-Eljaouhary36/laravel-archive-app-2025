@@ -27,9 +27,9 @@
                                                 
                                     <!-- File Type -->
                                     <div>
-                                        <x-input-label for="file_type" :value="__('نوع الملفات')" />
+                                        <x-input-label for="file_type" :value="__('المصلحة')" />
                                         <select id="file_type" name="file_type" class="block mt-1 w-full rounded-lg" required>
-                                            <option value="">{{ __('حدد الدور') }}</option>
+                                            <option value="">{{ __('حدد المصلحة') }}</option>
                                             <option value="الرئاسة" {{ old('file_type') == 'الرئاسة' ? 'selected' : '' }}>الرئاسة</option>
                                             <option value="النيابة العامة" {{ old('file_type') == 'النيابة العامة' ? 'selected' : '' }}>النيابة العامة</option>
                                         </select>
