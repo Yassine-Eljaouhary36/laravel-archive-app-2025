@@ -13,11 +13,13 @@ class Box extends Model
         'saving_base_number',
         'box_number',
         'file_type',
+        'type',
         'year_of_judgment',
         'total_files',
         'user_id',
         'validated_by',
-        'validated_at'
+        'validated_at',
+        'tribunal_id'
     ];
 
     protected $dates = ['validated_at'];
@@ -41,4 +43,10 @@ class Box extends Model
     {
         return !is_null($this->validated_at);
     }
+
+    public function tribunal()
+    {
+        return $this->belongsTo(Tribunal::class);
+    }
+
 }

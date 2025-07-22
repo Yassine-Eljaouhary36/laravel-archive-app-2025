@@ -30,7 +30,7 @@
                         
                         <!-- نوع الملف -->
                         <div>
-                            <label for="file_type" class="block text-sm font-medium text-gray-700">نوع الملف</label>
+                            <label for="file_type" class="block text-sm font-medium text-gray-700">المصلحة</label>
                             <select name="file_type" id="file_type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                 <option value="">كل الأنواع</option>
                                 <option value="الرئاسة" {{ request('file_type') == 'الرئاسة' ? 'selected' : '' }}>الرئاسة</option>
@@ -60,36 +60,43 @@
 
                 <div class="flex justify-between mb-4">
                     <h3 class="text-lg font-medium">جميع العلب ({{ $boxes->total() }})</h3>
-                    <a href="{{ route('boxes.create') }}" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-                        إنشاء علبة جديدة
-                    </a>
+                    @if(auth()->user()->hasAnyRole(['admin', 'user']))
+                        <a href="{{ route('boxes.create') }}" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                            إنشاء علبة جديدة
+                            <x-heroicon-o-plus class="ml-2 mr-2 h-5 w-5 inline"/>
+                        </a>
+                    @endif
                 </div>
 
 
                     <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
+                        <table class="w-full table-auto divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{__('رقم العلبة')}}</th>
-                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{__('رقم قاعدة الحفظ')}}</th>
-                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{__('المصلحة')}}</th>
-                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{__('سنة الحكم')}}</th>
-                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{__('عدد الملفات')}}</th>
+                                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{__('رقم العلبة')}}</th>
+                                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{__('رقم قاعدة الحفظ')}}</th>
+                                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{__('المصلحة')}}</th>
+                                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{__('نوع الملفات')}}</th>
+                                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{__('المحكمة')}}</th>
+                                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{__('سنة الحكم')}}</th>
+                                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{__('عدد الملفات')}}</th>
                                     @if(auth()->user()->hasRole(['admin', 'controller']))
-                                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{__('المستخدم')}}</th>
+                                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{__('المستخدم')}}</th>
                                     @endif
-                                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">{{__('تم التحقق ')}}</th>
-                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
+                                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">{{__('تم التحقق ')}}</th>
+                                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 @foreach($boxes as $box)
                                 <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">{{ $box->box_number }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">{{ $box->saving_base_number }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">{{ $box->file_type }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">{{ $box->year_of_judgment }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">{{ $box->files_count }}</td>
+                                    <td class="px-4 py-4 whitespace-nowrap">{{ $box->box_number }}</td>
+                                    <td class="px-4 py-4 whitespace-nowrap">{{ $box->saving_base_number }}</td>
+                                    <td class="px-4 py-4 whitespace-nowrap">{{ $box->file_type }}</td>
+                                    <td class="px-4 py-4 whitespace-nowrap">{{ $box->type }}</td>
+                                    <td class="px-4 py-4 whitespace-nowrap">{{ $box->tribunal->tribunal ?? '' }}</td>
+                                    <td class="px-4 py-4 whitespace-nowrap">{{ $box->year_of_judgment }}</td>
+                                    <td class="px-4 py-4 whitespace-nowrap">{{ $box->files_count }}</td>
                                     @if(auth()->user()->hasRole(['admin', 'controller']))
                                         <td>{{ $box->user->name ?? 'System' }}</td>
                                     @endif
@@ -108,7 +115,7 @@
                                             </span>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap" style="display: flex">
+                                    <td class="px-4 py-4 whitespace-nowrap" style="display: flex">
                                         <a href="{{ route('boxes.show', $box->id) }}" class="text-blue-500 hover:text-blue-700 mr-2" title="عرض">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -138,4 +145,19 @@
             </div>
         </div>
     </div>
+
+    @push('scripts')
+        @if (session('success'))
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'نجاح',
+                        text: '{{ session('success') }}',
+                        confirmButtonText: 'حسناً'
+                    });
+                });
+            </script>
+        @endif
+    @endpush
 </x-app-layout>

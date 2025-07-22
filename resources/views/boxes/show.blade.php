@@ -48,6 +48,10 @@
                                 <table class="w-full text-right table-fixed border-collapse">
                                     <tbody>
                                         <tr class="border-b">
+                                            <th class="py-2 px-4 font-semibold text-gray-900">المحكمة</th>
+                                            <td class="py-2 px-4 text-gray-700">{{ $box->tribunal->tribunal ?? 'غير محددة' }}</td>
+                                        </tr>
+                                        <tr class="border-b">
                                             <th class="py-2 px-4 font-semibold text-gray-900">رقم قاعدة الحفظ</th>
                                             <td class="py-2 px-4 text-gray-700">{{ $box->saving_base_number }}</td>
                                         </tr>
@@ -74,6 +78,10 @@
                                         <tr class="border-b">
                                             <th class="py-2 px-4 font-semibold text-gray-900">المصلحة</th>
                                             <td class="py-2 px-4 text-gray-700">{{ $box->file_type }}</td>
+                                        </tr>
+                                        <tr class="border-b bg-gray-50">
+                                            <th class="py-2 px-4 font-semibold text-gray-900">نوع الملفات</th>
+                                            <td class="py-2 px-4 text-gray-700">{{ $box->type }}</td>
                                         </tr>
                                         <tr class="border-b bg-gray-50">
                                             <th class="py-2 px-4 font-semibold text-gray-900">سنة الحكم</th>

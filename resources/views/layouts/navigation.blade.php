@@ -23,6 +23,10 @@
                         <x-heroicon-s-user-group class="ml-2 mr-2 h-5 w-5 inline"/>
                         {{ __('إدارة المستخدمين') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('admin.tribunaux.index')" :active="request()->routeIs('admin.tribunaux.index')">
+                        <x-hugeicons-justice-scale-01 class="ml-2 mr-2 h-5 w-5 inline"/>
+                        {{ __('إدارة المحاكم') }}
+                    </x-nav-link>
                 @endif
 
                 @if(Auth::check())

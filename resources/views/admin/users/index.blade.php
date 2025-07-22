@@ -30,10 +30,10 @@
                         <table class="w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
+                                                                        <th scope="col" style="text-align: start" class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('الاسم') }}</th>
                                     <th scope="col" style="text-align: start" class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('البريد الإلكتروني') }}</th>
                                     <th scope="col" style="text-align: start" class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('الدور') }}</th>
                                     <th scope="col" style="text-align: start" class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('الحالة') }}</th>
-                                    <th scope="col" style="text-align: start" class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('الاسم') }}</th>
                                     <th scope="col" style="text-align: start" class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
                                 </tr>
                             </thead>

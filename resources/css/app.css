@@ -2,3 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom dropdown styles */
+#dropdown_options {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e0 #f7fafc;
+}
+
+#dropdown_options::-webkit-scrollbar {
+    width: 8px;
+}
+
+#dropdown_options::-webkit-scrollbar-track {
+    background: #f7fafc;
+}
+
+#dropdown_options::-webkit-scrollbar-thumb {
+    background-color: #cbd5e0;
+    border-radius: 4px;
+}

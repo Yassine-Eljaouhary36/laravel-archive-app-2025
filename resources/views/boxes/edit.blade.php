@@ -20,15 +20,44 @@
                                 {{ __('معلومات العلبة') }} : 
                                 <span class="px-4 py-2 bg-blue-200 text-black-800 rounded-lg">{{$box->box_number}}</span>
                             </h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <!-- Tribunal -->
+                                <div>
+                                    <x-input-label for="tribunal_id" :value="__('المحكمة')" />
+                                    <select id="tribunal_id" name="tribunal_id" class="block mt-1 w-full rounded-lg" required>
+                                        <option value="">{{ __('اختر المحكمة') }}</option>
+                                        @foreach($tribunaux as $tribunal)
+                                            <option value="{{ $tribunal->id }}" {{ old('tribunal_id', $box->tribunal_id) == $tribunal->id ? 'selected' : '' }}>
+                                                {{ $tribunal->tribunal }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    <x-input-error :messages="$errors->get('tribunal_id')" class="mt-2" />
+                                </div>
+
                                 <!-- Saving Base Number -->
                                 <div>
                                     <x-input-label for="saving_base_number" :value="__('رقم قاعدة الحفظ')" />
-                                    <x-text-input id="saving_base_number" class="block mt-1 w-full" type="text" 
-                                        name="saving_base_number" :value="old('saving_base_number', $box->saving_base_number)" required />
+                                        <div class="relative mt-1">
+                                            <input type="text" id="search_input" class="block w-full rounded-lg border-gray-300" placeholder="{{ __('ابحث هنا...') }}" autocomplete="off">
+                                            <select id="saving_base_number" name="saving_base_number" class="hidden" required>
+                                                <option value="">{{ __('اختر رقم قاعدة الحفظ') }}</option>
+                                                @foreach($savingBases as $base)
+                                                    <option value="{{ $base->number }}" 
+                                                        {{ (old('saving_base_number', $box->saving_base_number) == $base->number) ? 'selected' : '' }}
+                                                       
+                                                        >
+                                                        {{ $base->number }} 
+                                                        @if($base->description)- {{ $base->description }}@endif
+                                                    </option>
+                                                    {{$box->saving_base_number}}
+                                                @endforeach
+                                            </select>
+                                            <div id="dropdown_options" class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg hidden max-h-60 overflow-auto"></div>
+                                        </div>
                                     <x-input-error :messages="$errors->get('saving_base_number')" class="mt-2" />
                                 </div>
-                                
+
                                 <!-- File Type -->
                                 <div>
                                     <x-input-label for="file_type" :value="__('المصلحة')" />
@@ -40,7 +69,21 @@
                                     <x-input-error :messages="$errors->get('file_type')" class="mt-2" />
                                 </div>
 
-                                
+                                <div>
+                                    <x-input-label for="type" :value="__(' نوع الملفات')" />
+                                    <select id="type" name="type" class="block mt-1 w-full rounded-lg" required>
+                                        <option value="">{{ __(' نوع الملفات') }}</option>
+                                        @foreach($types as $type)
+                                            <option value="{{ $type->name }}" 
+                                                {{ (old('type', $box->type) == $type->name) ? 'selected' : '' }}
+                                                >
+                                                {{ $type->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    <x-input-error :messages="$errors->get('type')" class="mt-2" />
+                                </div>
+
                                 <!-- Year of Judgment -->
                                 <div>
                                     <x-input-label for="year_of_judgment" :value="__('سنة الحكم')" />
@@ -56,7 +99,7 @@
                             <div class="flex justify-between items-center mb-4">
                                 <h3 class="text-lg font-medium text-gray-900">{{ __('الملفات') }}</h3>
                                 <x-primary-button type="button" id="addFileBtn" onclick="showFileForm()">
-                                    {{ __('إضافة ملف جديد') }}
+                                    {{ __('إضافة ملف جديد') }} <x-heroicon-o-plus class="ml-2 mr-2 h-5 w-5 inline"/>
                                 </x-primary-button>
                             </div>
 
@@ -180,7 +223,7 @@
 
         function showFileForm() {
             document.getElementById('fileFormContainer').classList.remove('hidden');
-            document.getElementById('fileFormTitle').textContent = 'Add New File';
+            document.getElementById('fileFormTitle').textContent = 'إضافة ملف جديد';
             editingIndex = null;
             resetFileForm();
         }
@@ -207,12 +250,99 @@
                 id: editingIndex !== null ? files[editingIndex].id : null
             };
 
+            // Get year of judgment value
+            const savingBaseNumber = document.getElementById('saving_base_number').value.trim();
+            const typeOfFile = document.getElementById('file_type').value.trim();
+            const yearOfJudgment = document.getElementById('year_of_judgment').value.trim();
+            const typeFile = document.getElementById('type').value.trim();
+            const tribunalId = document.getElementById('tribunal_id').value.trim();
+
+            // Validate required fields
+            let isValid = true;
+            const errorMessages = [];
+
+            if (!tribunalId) {
+                errorMessages.push('المحكمة');
+                isValid = false;
+            }
+            if (!savingBaseNumber) {
+                errorMessages.push('رقم قاعدة الحفظ');
+                isValid = false;
+            }
+            if (!typeOfFile) {
+                errorMessages.push('المصلحة');
+                isValid = false;
+            }
+            if (!yearOfJudgment) {
+                errorMessages.push('سنة الحكم');
+                isValid = false;
+            }
+            if (!typeFile) {
+                errorMessages.push('نوع الملفات');
+                isValid = false;
+            }
+
+            if (!fileData.file_number) {
+                errorMessages.push('رقم الملف مطلوب');
+                isValid = false;
+            }
+
+            if (!fileData.symbol) {
+                errorMessages.push('رمز الملف مطلوب');
+                isValid = false;
+            }
+
+            if (!fileData.year_of_opening) {
+                errorMessages.push('سنة فتح الملف مطلوبة');
+                isValid = false;
+            }
+
+            if (!fileData.judgment_date) {
+                errorMessages.push('تاريخ الحكم مطلوب');
+                isValid = false;
+            }
+
+            // Validate year of opening is before or equal to year of judgment
+            if (fileData.year_of_opening && yearOfJudgment) {
+                if (parseInt(fileData.year_of_opening) > parseInt(yearOfJudgment)) {
+                    errorMessages.push('سنة فتح الملف يجب أن تكون قبل أو تساوي سنة الحكم');
+                    isValid = false;
+                }
+            }
+
+            if (!isValid) {
+                // Show error messages using SweetAlert
+                Swal.fire({
+                    icon: 'error',
+                    title: 'خطأ',
+                    html: 'الرجاء تصحيح الأخطاء التالية:<br><br>' + errorMessages.join('<br>'),
+                    confirmButtonText: 'حسناً'
+                });
+                return;
+            }
+
             if (editingIndex !== null) {
                 // Update existing file
                 files[editingIndex] = fileData;
+                // Show success message for editing
+                Swal.fire({
+                    icon: 'success',
+                    title: 'تم التعديل بنجاح',
+                    text: 'تم تحديث بيانات الملف بنجاح',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
             } else {
                 // Add new file
                 files.push(fileData);
+                // Show success message for adding
+                Swal.fire({
+                    icon: 'success',
+                    title: 'تم الإضافة بنجاح',
+                    text: 'تم إضافة الملف الجديد بنجاح',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
             }
 
             updateFilesTable();
@@ -229,16 +359,32 @@
             document.getElementById('judgment_date').value = file.judgment_date;
             
             document.getElementById('fileFormContainer').classList.remove('hidden');
-            document.getElementById('fileFormTitle').textContent = 'Edit File';
+            document.getElementById('fileFormTitle').textContent = 'تعديل الملف';
             editingIndex = index;
         }
 
         function removeFile(index) {
-            if (confirm('Are you sure you want to remove this file?')) {
-                files.splice(index, 1);
-                updateFilesTable();
-                updateHiddenInputs();
-            }
+            Swal.fire({
+                title: 'هل أنت متأكد؟',
+                text: "لن تتمكن من التراجع عن هذا الإجراء!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'نعم، احذفه!',
+                cancelButtonText: 'إلغاء'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    files.splice(index, 1);
+                    updateFilesTable();
+                    updateHiddenInputs();
+                    Swal.fire(
+                        'تم الحذف!',
+                        'تم إزالة الملف بنجاح.',
+                        'success'
+                    );
+                }
+            });
         }
 
         function updateFilesTable() {
@@ -308,10 +454,73 @@
             });
         }
 
-        // Initialize with existing files
+
         document.addEventListener('DOMContentLoaded', function() {
             updateFilesTable();
             updateHiddenInputs();
+            const searchInput = document.getElementById('search_input');
+            const originalSelect = document.getElementById('saving_base_number');
+            const dropdownOptions = document.getElementById('dropdown_options');
+                
+            // Create dropdown options from select element
+            function populateDropdown(filter = '') {
+                dropdownOptions.innerHTML = '';
+                const options = Array.from(originalSelect.options);
+                const filteredOptions = options.filter(option => 
+                    option.text.toLowerCase().includes(filter.toLowerCase())
+                );
+                    
+                if (filteredOptions.length === 0) {
+                    const noResults = document.createElement('div');
+                    noResults.className = 'p-2 text-gray-500';
+                    noResults.textContent = 'لا توجد نتائج';
+                    dropdownOptions.appendChild(noResults);
+                    return;
+                }
+                    
+                filteredOptions.forEach(option => {
+                    if (option.value === '') return; // Skip the placeholder option
+                        
+                    const optionElement = document.createElement('div');
+                    optionElement.className = 'p-2 hover:bg-gray-100 cursor-pointer text-right';
+                    optionElement.textContent = option.text;
+                    optionElement.dataset.value = option.value;
+                        
+                    optionElement.addEventListener('click', () => {
+                        originalSelect.value = option.value;
+                        searchInput.value = option.text;
+                        dropdownOptions.classList.add('hidden');
+                    });
+                        
+                    dropdownOptions.appendChild(optionElement);
+                });
+            }
+                
+            // Toggle dropdown on input focus
+            searchInput.addEventListener('focus', () => {
+                populateDropdown();
+                dropdownOptions.classList.remove('hidden');
+            });
+                
+            // Filter options on input
+            searchInput.addEventListener('input', (e) => {
+                populateDropdown(e.target.value);
+            });
+                
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.relative')) {
+                    dropdownOptions.classList.add('hidden');
+                }
+            });
+                
+            // Initialize with selected value if exists
+            if (originalSelect.value) {
+                const selectedOption = originalSelect.options[originalSelect.selectedIndex];
+                if (selectedOption) {
+                    searchInput.value = selectedOption.text;
+                }
+            }
         });
     </script>
     @endpush

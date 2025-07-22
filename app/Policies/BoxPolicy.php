@@ -16,7 +16,11 @@ class BoxPolicy
 
     public function update(User $user, Box $box)
     {
-        return !$box->isValidated() && ($user->hasRole('admin') || $box->user_id == $user->id);
+        if (!$box->isValidated()) {
+            return $user->hasRole('admin') || $box->user_id == $user->id;
+        }
+
+        return $box->isValidated() && $user->hasRole('admin');
     }
 
     public function show(User $user, Box $box)

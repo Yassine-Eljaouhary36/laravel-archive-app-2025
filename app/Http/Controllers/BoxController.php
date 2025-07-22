@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ValidateBoxRequest;
 use App\Models\Box;
 use App\Models\File;
+use App\Models\FileType;
+use App\Models\SavingBase;
+use App\Models\Tribunal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -40,7 +43,11 @@ class BoxController extends Controller
 
     public function create()
     {
-        return view('boxes.create');
+        return view('boxes.create', [
+            'savingBases' => SavingBase::all(),
+            'types' => FileType::all(),
+            'tribunaux' => Tribunal::where('active', true)->get()
+        ]);
     }
 
     public function store(Request $request)
@@ -48,6 +55,8 @@ class BoxController extends Controller
         $validated = $request->validate([
             'saving_base_number' => 'required|string|max:255',
             'file_type' => 'required|string|max:255',
+            'type' => 'required|string|max:255',
+            'tribunal_id' => 'required|exists:tribunaux,id',
             'year_of_judgment' => 'required|integer|min:1900|max:' . (date('Y') + 1),
             'files' => 'required|array',
             'files.*.file_number' => 'required|string|max:10',
@@ -57,13 +66,18 @@ class BoxController extends Controller
             'files.*.judgment_date' => 'required|date',
         ]);
 
-        $max = Box::max('box_number');
+        $max = Box::where('tribunal_id', $validated['tribunal_id'])
+                    ->where('type', $validated['type'])
+                    ->max('box_number');
+
         $next = is_numeric($max) ? $max + 1 : 1;
 
         $box = Box::create([
             'saving_base_number' => $validated['saving_base_number'],
             'box_number' => $next,
             'file_type' => $validated['file_type'],
+            'type' => $validated['type'],
+            'tribunal_id' => $validated['tribunal_id'],
             'year_of_judgment' => $validated['year_of_judgment'],
             'total_files' => count($validated['files']),
             'user_id' => auth()->id(), // Associate with current user
@@ -72,12 +86,20 @@ class BoxController extends Controller
         // Add order to each file
         $order = 1;
         foreach ($validated['files'] as $fileData) {
+            // Parse original date
+            $date = \Carbon\Carbon::parse($fileData['judgment_date']);
+
+            // Set the year from box judgment year
+            $date->year($validated['year_of_judgment']);
+
+            $fileData['judgment_date'] = $date->toDateString();
             $fileData['order'] = $order++;
+            
             $box->files()->create($fileData);
         }
 
         return redirect()->route('boxes.index')
-            ->with('success', "Box #{$next} and files created successfully.");
+            ->with('success', "تم إنشاء الصندوق رقم {$next} والملفات بنجاح.");
 
     }
 
@@ -95,23 +117,24 @@ class BoxController extends Controller
     public function edit(Box $box)
     {
         $this->authorize('update', $box);
-        if ($box->isValidated()) {
-            abort(403, 'Validated boxes cannot be modified');
-        }
+        $savingBases = SavingBase::all();
+        $types = FileType::all();
+        $tribunaux = Tribunal::where('active', true)->get();
+
         $box->load('files');
-        return view('boxes.edit', compact('box'));
+        return view('boxes.edit', compact('box','savingBases','types','tribunaux'));
     }
 
 
     public function update(Request $request, Box $box)
     {
         $this->authorize('update', $box);
-        if ($box->isValidated()) {
-            abort(403, 'Validated boxes cannot be modified');
-        }
+
         $validated = $request->validate([
             'saving_base_number' => 'required|string|max:255',
             'file_type' => 'required|string|max:255',
+            'type' => 'required|string|max:255',
+            'tribunal_id' => 'required|exists:tribunaux,id',
             'year_of_judgment' => 'required|integer|min:1900|max:' . (date('Y') + 1),
             'files' => 'required|array',
             'files.*.id' => 'nullable|integer|exists:files,id',
@@ -127,7 +150,9 @@ class BoxController extends Controller
             $box->update([
                 'saving_base_number' => $validated['saving_base_number'],
                 'file_type' => $validated['file_type'],
+                'type' => $validated['type'],
                 'year_of_judgment' => $validated['year_of_judgment'],
+                'tribunal_id' => $validated['tribunal_id'],
             ]);
 
             // Handle files
@@ -147,7 +172,7 @@ class BoxController extends Controller
                             'symbol' => $fileData['symbol'],
                             'year_of_opening' => $fileData['year_of_opening'],
                             'judgment_number' => $fileData['judgment_number'],
-                            'judgment_date' => $fileData['judgment_date'],
+                            'judgment_date' => \Carbon\Carbon::parse($fileData['judgment_date'])->year($validated['year_of_judgment'])->toDateString(),
                         ]);
                         $existingFileIds[] = $file->id;
                     } else {
