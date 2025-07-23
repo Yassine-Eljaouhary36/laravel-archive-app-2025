@@ -25,6 +25,12 @@
                                 @endif
                             </form>
                         @endcan
+                        @if($box->isValidated() && auth()->user()->hasRole(['admin', 'controller']))
+                            <a href="{{ route('boxes.export', $box) }}" 
+                            class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 ml-4">
+                                <i class="fas fa-file-excel mr-2"></i> تصدير إلى Excel
+                            </a>
+                        @endif
                     </div>
 
                     <!-- Validation Warning -->

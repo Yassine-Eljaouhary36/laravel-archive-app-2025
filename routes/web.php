@@ -65,6 +65,10 @@ Route::prefix('controller')->middleware(['auth', 'role:controller'])->group(func
     // In routes/web.php
     Route::post('/boxes/{box}/validate', [BoxController::class, 'validateBox'])
         ->name('boxes.validate');
-    });
+});
 
+Route::get('/boxes/{box}/export', [BoxController::class, 'export'])
+    ->middleware(['auth', 'role:admin|controller'])
+    ->name('boxes.export');
+    
 require __DIR__.'/auth.php';

@@ -10,6 +10,9 @@ use App\Models\SavingBase;
 use App\Models\Tribunal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Exports\BoxFilesExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class BoxController extends Controller
 {
@@ -219,5 +222,25 @@ class BoxController extends Controller
             : 'Box validation removed';
         
         return back()->with('success', $message);
+    }
+
+
+    public function export(Box $box): BinaryFileResponse
+    {
+        $box->load('files'); // if you need the files relation
+        
+        // Check if box is validated
+        if (!$box->isValidated()) {
+            abort(403, 'Only validated boxes can be exported');
+        }
+        
+        // Check if user has permission
+        if (!auth()->user()->hasRole(['admin', 'controller'])) {
+            abort(403);
+        }
+        
+        $fileName = 'box_' . $box->box_number . '_files.xlsx';
+        
+        return Excel::download(new BoxFilesExport($box), $fileName);
     }
 }
