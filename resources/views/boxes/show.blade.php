@@ -140,6 +140,7 @@
                                     <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">سنة الفتح</th>
                                     <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">رقم الحكم</th>
                                     <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">تاريخ الحكم</th>
+                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">ملاحظات</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
@@ -153,6 +154,7 @@
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         {{ $file->judgment_date ? \Carbon\Carbon::parse($file->judgment_date)->format('Y-m-d') : 'N/A' }}
                                     </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">{{ $file->remark ?? 'N/A' }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>

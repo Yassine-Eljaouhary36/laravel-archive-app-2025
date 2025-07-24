@@ -16,7 +16,8 @@ class File extends Model
         'year_of_opening',
         'judgment_number',
         'judgment_date',
-        'order'
+        'order',
+        'remark'
     ];
 
     public function box()

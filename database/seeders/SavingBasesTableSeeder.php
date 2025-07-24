@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\SavingBase;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class SavingBasesTableSeeder extends Seeder
 {
@@ -13,14 +14,26 @@ class SavingBasesTableSeeder extends Seeder
      */
     public function run(): void
     {
-            $bases = [
-                ['number' => 'قاعدة 1', 'description' => 'المحكمة الابتدائية'],
-                ['number' => 'قاعدة 2', 'description' => 'محكمة الاستئناف'],
-                // etc...
-            ];
-            
-            foreach ($bases as $base) {
-                SavingBase::create($base);
-            }
+
+
+        $path = database_path('data/saving_bases.csv');
+        if (!file_exists($path)) {
+            echo "CSV file not found: $path\n";
+            return;
+        }
+
+        $file = fopen($path, 'r');
+        fgetcsv($file); // skip header
+
+        while (($data = fgetcsv($file)) !== false) {
+            DB::table('saving_bases')->insert([
+                'number' => $data[0],
+                'description' => $data[1],
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        fclose($file);
     }
 }

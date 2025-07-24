@@ -35,7 +35,7 @@ class BoxFilesExport implements FromCollection, WithHeadings, WithStyles, WithDr
                 'F' => $file->judgment_date 
                     ? \Carbon\Carbon::parse($file->judgment_date)->format('Y-m-d')
                     : '',                                      // تاريخ الحكم
-                'G' => ''                                     // ملاحظات
+                'G' => $file->remark ?? ''                                      // ملاحظات
             ];
         });
     }
@@ -49,12 +49,41 @@ class BoxFilesExport implements FromCollection, WithHeadings, WithStyles, WithDr
     {
         // Clear any automatic data that might appear in A1
         $sheet->setCellValue('A1', '');
+        // Clear any automatic data that might appear in E2,E3,E4,E5
+        $sheet->setCellValue('E2', '');
+        $sheet->setCellValue('E3', '');
+        $sheet->setCellValue('E4', '');
+        $sheet->setCellValue('E5', '');
+
+        // Clear any automatic data that might appear in F2,F3,F4,F5
+        $sheet->setCellValue('F2', '');
+        $sheet->setCellValue('F3', '');
+        $sheet->setCellValue('F4', '');
+        $sheet->setCellValue('F5', '');
+
+        // Clear any automatic data that might appear in G2,G3,G4,G5
+        $sheet->setCellValue('G2', '');
+        $sheet->setCellValue('G3', '');
+        $sheet->setCellValue('G4', '');
+        $sheet->setCellValue('G5', '');
+
+        // Clear any automatic data that might appear in G2,G3,G4,G5
+        $sheet->setCellValue('A2', '');
+        $sheet->setCellValue('B2', '');
+        $sheet->setCellValue('C3', '');
+        $sheet->setCellValue('D4', '');
+        $sheet->setCellValue('E5', '');
+        $sheet->setCellValue('F5', '');
+        $sheet->setCellValue('G5', '');
+
+        $sheet->setCellValue('C2', '');
+        $sheet->setCellValue('D2', '');
 
         // Set RTL direction for the entire sheet
         $sheet->setRightToLeft(true);
 
         // Set default font
-        $sheet->getParent()->getDefaultStyle()->getFont()->setName('Arial')->setSize(14);
+        $sheet->getParent()->getDefaultStyle()->getFont()->setName('Sakkal Majalla')->setSize(14);
 
         // ======= LOGO SECTION ========
         $sheet->mergeCells('A1:G1');
@@ -67,49 +96,70 @@ class BoxFilesExport implements FromCollection, WithHeadings, WithStyles, WithDr
         $sheet->getRowDimension(3)->setRowHeight(50);
         $sheet->getRowDimension(4)->setRowHeight(50);
         $sheet->getRowDimension(5)->setRowHeight(50);
+
         // ======= BOX INFORMATION SECTION ========
-        // Court Information (A2:D2)
-        $sheet->mergeCells('A2:D2');
-        $sheet->setCellValue('A2', 'المحكمة: ' . ($this->box->tribunal->tribunal ?? ''));
-        $sheet->getStyle('A2:D2')->applyFromArray($this->getInfoCellStyle());
 
+        $sheet->mergeCells('A3:G3');
+        $sheet->setCellValue('A3', 'جرد تفصيلي للملفات المحالة من '.($this->box->tribunal->tribunal ?? '').' إلى المركز الجهوي للحفظ بمكناس');
+        $sheet->getStyle('A3:G3')->applyFromArray($this->getInfoCellStyle());
 
-        // Saving Base Number (E2:F2)
-        $sheet->mergeCells('E2:F2');
-        $sheet->setCellValue('E2', 'رقم قاعدة الحفظ: ' . $this->box->saving_base_number);
-        $sheet->getStyle('E2:F2')->applyFromArray($this->getInfoCellStyle());
+        // Court Information (A2|B2)
+        $sheet->setCellValue('A5', 'المحكمة: ');
+        $sheet->getStyle('A5')->applyFromArray($this->getInfoCellStyle());
+        $sheet->mergeCells('B5:C5');
+        $sheet->setCellValue('B5', ($this->box->tribunal->tribunal ?? ''));
+        $sheet->getStyle('B5:C5')->applyFromArray($this->getInfoCellStyle());
 
-        // File Type (A3:D3)
-        $sheet->mergeCells('A3:D3');
-        $sheet->setCellValue('A3', 'نوع الملف: ' . $this->box->file_type);
-        $sheet->getStyle('A3:D3')->applyFromArray($this->getInfoCellStyle());
+        // Saving Base Number (C2|D2)
+        $sheet->setCellValue('E5', 'رقم قاعدة الحفظ: ');
+        $sheet->getStyle('E5')->applyFromArray($this->getInfoCellStyle());
+        $sheet->mergeCells('F5:G5');
+        $sheet->setCellValue('F5', $this->box->saving_base_number);
+        $sheet->getStyle('F5:G5')->applyFromArray($this->getInfoCellStyle());
 
-        // Box Type (E3:F3)
-        $sheet->mergeCells('E3:F3');
-        $sheet->setCellValue('E3', 'النوع: ' . $this->box->type);
-        $sheet->getStyle('E3:F3')->applyFromArray($this->getInfoCellStyle());
+        // File Type (A3|B3)
+        $sheet->setCellValue('A6', 'نوع الملف: ');
+        $sheet->getStyle('A6')->applyFromArray($this->getInfoCellStyle());
+        $sheet->mergeCells('B6:C6');
+        $sheet->setCellValue('B6', $this->box->file_type);
+        $sheet->getStyle('B6:C6')->applyFromArray($this->getInfoCellStyle());
 
-        // Box Number (A4:D4)
-        $sheet->mergeCells('A4:D4');
-        $sheet->setCellValue('A4', 'رقم العلبة: ' . $this->box->box_number);
-        $sheet->getStyle('A4:D4')->applyFromArray($this->getInfoCellStyle());
+        // Box Type (C3:D3)
 
-        // Files Count (E4:F4)
-        $sheet->mergeCells('E4:F4');
-        $sheet->setCellValue('E4', 'عدد الملفات: ' . $this->box->files->count());
-        $sheet->getStyle('E4:F4')->applyFromArray($this->getInfoCellStyle());
+        $sheet->setCellValue('E6', 'النوع: ');
+        $sheet->getStyle('E6')->applyFromArray($this->getInfoCellStyle());
+        $sheet->mergeCells('F6:G6');
+        $sheet->setCellValue('F6', $this->box->type);
+        $sheet->getStyle('F6:G6')->applyFromArray($this->getInfoCellStyle());
 
-        // Judgment Year (A5:D5)
-        $sheet->mergeCells('A5:D5');
-        $sheet->setCellValue('A5', 'سنة الحكم: ' . $this->box->year_of_judgment);
-        $sheet->getStyle('A5:D5')->applyFromArray($this->getInfoCellStyle());
+        // Box Number (A4|D4)
+        $sheet->setCellValue('A7', 'رقم العلبة: ');
+        $sheet->getStyle('A7')->applyFromArray($this->getInfoCellStyle());
+        $sheet->mergeCells('B7:C7');
+        $sheet->setCellValue('B7', $this->box->box_number);
+        $sheet->getStyle('B7:C7')->applyFromArray($this->getInfoCellStyle());
 
-        // Empty space for balance (E5:F5)
-        $sheet->mergeCells('E5:F5');
-        $sheet->getStyle('E5:F5')->applyFromArray($this->getInfoCellStyle());
+        // Files Count (C4:D4)
+ 
+        $sheet->setCellValue('E7', 'عدد الملفات: ');
+        $sheet->getStyle('E7')->applyFromArray($this->getInfoCellStyle());
+        $sheet->mergeCells('F7:G7');
+        $sheet->setCellValue('F7', $this->box->files->count());
+        $sheet->getStyle('F7:G7')->applyFromArray($this->getInfoCellStyle());
+
+        // Judgment Year (A5|D5)
+        $sheet->setCellValue('A8', 'سنة الحكم: ');
+        $sheet->getStyle('A8')->applyFromArray($this->getInfoCellStyle());
+        $sheet->mergeCells('B8:C8');
+        $sheet->setCellValue('B8',$this->box->year_of_judgment);
+        $sheet->getStyle('B8:C8')->applyFromArray($this->getInfoCellStyle());
+
+        // Empty space for balance (C5:D5)
+        // $sheet->mergeCells('E8:F8');
+        // $sheet->getStyle('E8:F8')->applyFromArray($this->getInfoCellStyle());
 
         // ======= FILES DATA HEADERS ========
-        $headerRow = 7;
+        $headerRow = 10;
         $headers = [
             'A' => 'الرقم الترتيبي',
             'B' => 'رقم الملف',
@@ -122,6 +172,7 @@ class BoxFilesExport implements FromCollection, WithHeadings, WithStyles, WithDr
 
         foreach ($headers as $col => $header) {
             $sheet->setCellValue($col.$headerRow, $header);
+             $sheet->getRowDimension($headerRow)->setRowHeight(80);
         }
 
         // Style for header row
@@ -148,7 +199,7 @@ class BoxFilesExport implements FromCollection, WithHeadings, WithStyles, WithDr
         ]);
 
         // ======= FILES DATA ========
-        $dataStartRow = 8;
+        $dataStartRow = 11;
         $filesData = $this->collection()->toArray();
 
         foreach ($filesData as $rowIndex => $rowData) {
@@ -192,7 +243,11 @@ class BoxFilesExport implements FromCollection, WithHeadings, WithStyles, WithDr
         }
 
         // Set print area
-        $sheet->getPageSetup()->setPrintArea('A1:G'.$dataEndRow);
+        // $sheet->getPageSetup()->setPrintArea('A1:G'.$dataEndRow);
+        // Fit to 1 page wide (A to G) and auto height
+        $sheet->getPageSetup()->setFitToPage(true);
+        $sheet->getPageSetup()->setFitToWidth(1);
+        $sheet->getPageSetup()->setFitToHeight(0);
     }
 
     protected function getInfoCellStyle()
@@ -209,7 +264,8 @@ class BoxFilesExport implements FromCollection, WithHeadings, WithStyles, WithDr
                 ]
             ],
             'alignment' => [
-                'horizontal' => Alignment::HORIZONTAL_RIGHT
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical' => Alignment::VERTICAL_CENTER
             ]
         ];
     }
@@ -220,9 +276,9 @@ class BoxFilesExport implements FromCollection, WithHeadings, WithStyles, WithDr
         $drawing->setName('Logo');
         $drawing->setDescription('Court Logo');
         $drawing->setPath(public_path('images/court_logo.png'));
-        $drawing->setHeight(200);
+        $drawing->setHeight(180);
         $drawing->setCoordinates('A1');
-        $drawing->setOffsetX(650);
+        $drawing->setOffsetX(0);
         $drawing->setOffsetY(0);
         
         return [$drawing];

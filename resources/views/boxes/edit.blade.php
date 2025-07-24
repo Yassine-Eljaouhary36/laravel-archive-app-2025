@@ -134,7 +134,7 @@
                                     </div>
                                 </div>
                                 
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
                                     <!-- Judgment Number -->
                                     <div>
                                         <x-input-label for="judgment_number" :value="__('رقم الحكم')" />
@@ -145,6 +145,13 @@
                                     <div>
                                         <x-input-label for="judgment_date" :value="__('تاريخ الحكم')" />
                                         <x-text-input id="judgment_date" class="block mt-1 w-full" type="date" name="judgment_date" />
+                                    </div>
+
+                                    <!-- Remark -->
+                                    <div>
+                                        <x-input-label for="remark" :value="__('ملاحظات (25 حرف كحد أقصى)')" />
+                                        <x-text-input id="remark" class="block mt-1 w-full" type="text" name="remark" maxlength="25" />
+                                        <p id="remark-counter" class="text-xs text-gray-500 mt-1">0/25</p>
                                     </div>
                                 </div>
                                 
@@ -169,6 +176,7 @@
                                             <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('سنة فتح الملف') }}</th>
                                             <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('رقم الحكم') }}</th>
                                             <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('تاريخ الحكم') }}</th>
+                                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('ملاحظات') }}</th>
                                             <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
                                         </tr>
                                     </thead>
@@ -215,6 +223,7 @@
                 'year_of_opening' => $file->year_of_opening,
                 'judgment_number' => $file->judgment_number,
                 'judgment_date' => $file->judgment_date,
+                'remark' => $file->remark, // Add this line
                 'id' => $file->id
             ];
         })) !!};
@@ -238,6 +247,7 @@
             document.getElementById('year_of_opening').value = '';
             document.getElementById('judgment_number').value = '';
             document.getElementById('judgment_date').value = '';
+            document.getElementById('remark').value = '';
         }
 
         function saveFile() {
@@ -247,6 +257,7 @@
                 year_of_opening: document.getElementById('year_of_opening').value,
                 judgment_number: document.getElementById('judgment_number').value,
                 judgment_date: document.getElementById('judgment_date').value,
+                remark: document.getElementById('remark').value,
                 id: editingIndex !== null ? files[editingIndex].id : null
             };
 
@@ -260,6 +271,12 @@
             // Validate required fields
             let isValid = true;
             const errorMessages = [];
+
+            // Add remark validation
+            if (fileData.remark && fileData.remark.length > 25) {
+                errorMessages.push('ملاحظات يجب ألا تتجاوز 25 حرفاً');
+                isValid = false;
+            }
 
             if (!tribunalId) {
                 errorMessages.push('المحكمة');
@@ -357,7 +374,8 @@
             document.getElementById('year_of_opening').value = file.year_of_opening;
             document.getElementById('judgment_number').value = file.judgment_number;
             document.getElementById('judgment_date').value = file.judgment_date;
-            
+            document.getElementById('remark').value = file.remark || '';
+
             document.getElementById('fileFormContainer').classList.remove('hidden');
             document.getElementById('fileFormTitle').textContent = 'تعديل الملف';
             editingIndex = index;
@@ -394,7 +412,7 @@
             if (files.length === 0) {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
+                    <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">
                         {{ __('No files added yet') }}
                     </td>
                 `;
@@ -410,6 +428,7 @@
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${file.year_of_opening}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${file.judgment_number}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${file.judgment_date}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${file.remark || ''}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <button type="button" onclick="editFile(${index})" class="text-indigo-600 hover:text-indigo-900 mr-3">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -521,6 +540,18 @@
                     searchInput.value = selectedOption.text;
                 }
             }
+
+            // Add this to your DOMContentLoaded event listener
+            document.getElementById('remark').addEventListener('input', function() {
+                const counter = document.getElementById('remark-counter');
+                const length = this.value.length;
+                counter.textContent = `${length}/25`;
+                if (length > 25) {
+                    counter.classList.add('text-red-500');
+                } else {
+                    counter.classList.remove('text-red-500');
+                }
+            });
         });
     </script>
     @endpush

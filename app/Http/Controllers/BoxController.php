@@ -67,6 +67,7 @@ class BoxController extends Controller
             'files.*.year_of_opening' => 'required|integer|min:1900|max:' . (date('Y') + 1),
             'files.*.judgment_number' => 'nullable|string|max:10',
             'files.*.judgment_date' => 'required|date',
+            'files.*.remark' => 'nullable|string', // Add this line
         ]);
 
         $max = Box::where('tribunal_id', $validated['tribunal_id'])
@@ -97,7 +98,8 @@ class BoxController extends Controller
 
             $fileData['judgment_date'] = $date->toDateString();
             $fileData['order'] = $order++;
-            
+            $fileData['remark'] = $fileData['remark'] ?? null; // Add this line
+
             $box->files()->create($fileData);
         }
 
@@ -110,7 +112,7 @@ class BoxController extends Controller
     {
         $this->authorize('show', $box);
         $files = $box->files()
-                ->select('id', 'box_id', 'file_number', 'symbol', 'year_of_opening', 'judgment_number', 'judgment_date')
+                ->select('id', 'box_id', 'file_number', 'symbol', 'year_of_opening', 'judgment_number', 'judgment_date', 'remark')
                 ->paginate(10);
 
         return view('boxes.show', compact('box', 'files'));
@@ -146,6 +148,7 @@ class BoxController extends Controller
             'files.*.year_of_opening' => 'required|integer|min:1900|max:' . (date('Y') + 1),
             'files.*.judgment_number' => 'nullable|string|max:255',
             'files.*.judgment_date' => 'required|date',
+            'files.*.remark' => 'nullable|string', // Add this line
         ]);
         
         DB::transaction(function () use ($validated, $box) {
@@ -176,6 +179,7 @@ class BoxController extends Controller
                             'year_of_opening' => $fileData['year_of_opening'],
                             'judgment_number' => $fileData['judgment_number'],
                             'judgment_date' => \Carbon\Carbon::parse($fileData['judgment_date'])->year($validated['year_of_judgment'])->toDateString(),
+                            'remark' => $fileData['remark'] ?? null,
                         ]);
                         $existingFileIds[] = $file->id;
                     } else {
@@ -185,8 +189,9 @@ class BoxController extends Controller
                             'symbol' => $fileData['symbol'],
                             'year_of_opening' => $fileData['year_of_opening'],
                             'judgment_number' => $fileData['judgment_number'],
-                            'judgment_date' => $fileData['judgment_date'],
+                            'judgment_date' => \Carbon\Carbon::parse($fileData['judgment_date'])->year($validated['year_of_judgment'])->toDateString(),
                             'order' => $orderCounter++,
+                            'remark' => $fileData['remark'] ?? null,
                         ]);
                         $existingFileIds[] = $newFile->id;
                     }
@@ -200,7 +205,7 @@ class BoxController extends Controller
             }
         });
 
-        return redirect()->route('boxes.index')->with('success', 'Box updated successfully!');
+        return redirect()->route('boxes.index')->with('success', 'تم تحديث الصندوق بنجاح!');
     }
 
     // In BoxController.php
