@@ -15,6 +15,7 @@ class Tribunal extends Model
         'tribunal',
         'circonscription_judiciaire',
         'active',
+        'centres_de_conservation',
     ];
 
     public function boxes()

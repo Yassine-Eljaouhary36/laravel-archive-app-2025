@@ -100,7 +100,7 @@ class BoxFilesExport implements FromCollection, WithHeadings, WithStyles, WithDr
         // ======= BOX INFORMATION SECTION ========
 
         $sheet->mergeCells('A3:G3');
-        $sheet->setCellValue('A3', 'جرد تفصيلي للملفات المحالة من '.($this->box->tribunal->tribunal ?? '').' إلى المركز الجهوي للحفظ بمكناس');
+        $sheet->setCellValue('A3', 'جرد تفصيلي للملفات المحالة من '.($this->box->tribunal->tribunal ?? '').' إلى المركز الجهوي للحفظ ( '.($this->box->tribunal->centres_de_conservation ?? '').')');
         $sheet->getStyle('A3:G3')->applyFromArray($this->getInfoCellStyle());
 
         // Court Information (A2|B2)

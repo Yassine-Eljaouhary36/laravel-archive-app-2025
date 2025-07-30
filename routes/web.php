@@ -4,7 +4,9 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\BoxController;
 use App\Http\Controllers\ControllerDashboardController;
+use App\Http\Controllers\FileTypeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TransfertController;
 use App\Http\Controllers\TribunalController;
 use App\Http\Controllers\UserDashboardController;
 use Illuminate\Support\Facades\Route;
@@ -64,6 +66,25 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
 
     Route::get('/tribunaux', [TribunalController::class, 'index'])->name('admin.tribunaux.index');
     Route::post('/tribunaux/toggle-active', [TribunalController::class, 'toggleActive'])->name('admin.tribunaux.toggleActive');
+
+    // File Types Routes
+    Route::get('/file-types', [FileTypeController::class, 'index'])->name('admin.file-types.index');
+    Route::post('/file-types/toggle-active', [FileTypeController::class, 'toggleActive'])->name('admin.file-types.toggleActive');
+    Route::get('/file-types/create', [FileTypeController::class, 'create'])->name('admin.file-types.create');
+    Route::post('/file-types', [FileTypeController::class, 'store'])->name('admin.file-types.store');
+    Route::get('/file-types/{fileType}/edit', [FileTypeController::class, 'edit'])->name('admin.file-types.edit');
+    Route::put('/file-types/{fileType}', [FileTypeController::class, 'update'])->name('admin.file-types.update');
+    Route::delete('/file-types/{fileType}', [FileTypeController::class, 'destroy'])->name('admin.file-types.destroy');
+
+
+    // Transferts Routes
+    Route::get('/transferts', [TransfertController::class, 'index'])->name('admin.transferts.index');
+    Route::get('/transferts/create', [TransfertController::class, 'create'])->name('admin.transferts.create');
+    Route::get('/transferts/get-boxes', [TransfertController::class, 'getBoxes'])->name('admin.transferts.get-boxes');
+    Route::post('/transferts', [TransfertController::class, 'store'])->name('admin.transferts.store');
+    Route::get('/transferts/{transfert}', [TransfertController::class, 'show'])->name('admin.transferts.show');
+    Route::get('/transferts/{transfert}/edit', [TransfertController::class, 'edit'])->name('admin.transferts.edit');
+    Route::put('/transferts/{transfert}', [TransfertController::class, 'update'])->name('admin.transferts.update');
 
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 

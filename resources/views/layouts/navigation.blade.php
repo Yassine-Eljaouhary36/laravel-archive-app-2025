@@ -27,6 +27,14 @@
                         <x-hugeicons-justice-scale-01 class="ml-2 mr-2 h-5 w-5 inline"/>
                         {{ __('إدارة المحاكم') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('admin.file-types.index')" :active="request()->routeIs('admin.file-types.index')">
+                        <x-heroicon-s-document-text class="ml-2 mr-2 h-5 w-5 inline"/>
+                        {{ __('إدارة أنواع الملفات') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('admin.transferts.index')" :active="request()->routeIs('admin.transferts.*')">
+                        <x-heroicon-s-arrow-right-circle class="ml-2 mr-2 h-5 w-5 inline"/>
+                        {{ __('إدارة التحويلات') }}
+                    </x-nav-link>
                 @endif
 
                 @if(Auth::check())

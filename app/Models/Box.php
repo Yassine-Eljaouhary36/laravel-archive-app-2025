@@ -22,7 +22,7 @@ class Box extends Model
         'tribunal_id'
     ];
 
-    protected $dates = ['validated_at'];
+    protected $dates = ['validated_at', 'created_at'];
 
     public function files()
     {
@@ -49,4 +49,8 @@ class Box extends Model
         return $this->belongsTo(Tribunal::class);
     }
 
+    public function transfert()
+    {
+        return $this->belongsTo(Transfert::class);
+    }
 }

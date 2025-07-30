@@ -21,6 +21,7 @@ class TribunauxSeeder extends Seeder
                 'tribunal' => $row[2],
                 'circonscription_judiciaire' => $row[1],
                 'active' => false,
+                'centres_de_conservation' => $row[3],
             ]);
         }
     }

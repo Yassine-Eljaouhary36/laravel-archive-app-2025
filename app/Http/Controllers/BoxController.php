@@ -48,7 +48,7 @@ class BoxController extends Controller
     {
         return view('boxes.create', [
             'savingBases' => SavingBase::all(),
-            'types' => FileType::all(),
+            'types' => FileType::where('active', true)->get(), // Only active file types
             'tribunaux' => Tribunal::where('active', true)->get()
         ]);
     }
@@ -150,7 +150,17 @@ class BoxController extends Controller
             'files.*.judgment_date' => 'required|date',
             'files.*.remark' => 'nullable|string', // Add this line
         ]);
-        
+
+        if (
+            $validated['tribunal_id'] != $box->tribunal_id ||
+            $validated['type'] != $box->type
+        ) {
+            $max = Box::where('tribunal_id', $validated['tribunal_id'])
+                    ->where('type', $validated['type'])
+                    ->max('box_number');
+            $box->box_number = is_numeric($max) ? $max + 1 : 1;
+        }
+
         DB::transaction(function () use ($validated, $box) {
             // Update box information
             $box->update([
@@ -159,6 +169,7 @@ class BoxController extends Controller
                 'type' => $validated['type'],
                 'year_of_judgment' => $validated['year_of_judgment'],
                 'tribunal_id' => $validated['tribunal_id'],
+                'box_number' => $box->box_number, // Keep updated value
             ]);
 
             // Handle files

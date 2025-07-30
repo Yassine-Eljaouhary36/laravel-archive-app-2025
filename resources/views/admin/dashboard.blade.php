@@ -35,7 +35,7 @@
                 <div class="bg-gradient-to-r from-green-50 to-green-100 p-6 rounded-xl shadow border-l-4 border-green-500">
                     <div class="flex justify-between items-start">
                         <div>
-                            <h3 class="text-lg font-medium text-gray-700">{{ __('العلب المعتمدة') }}</h3>
+                            <h3 class="text-lg font-medium text-gray-700">{{ __('العلب المعالجة') }}</h3>
                             <p class="mt-2 text-3xl font-bold text-gray-900">{{ $boxStats['validated'] }}</p>
                         </div>
                         <div class="bg-green-100 p-3 rounded-lg">
@@ -43,7 +43,7 @@
                         </div>
                     </div>
                     <div class="mt-4 flex items-center text-sm text-green-600">
-                        <span>معدل الاعتماد: {{ $boxStats['validation_rate'] }}%</span>
+                        <span>معدل المعالجة: {{ $boxStats['validation_rate'] }}%</span>
                     </div>
                 </div>
 
@@ -51,7 +51,7 @@
                 <div class="bg-gradient-to-r from-yellow-50 to-yellow-100 p-6 rounded-xl shadow border-l-4 border-yellow-500">
                     <div class="flex justify-between items-start">
                         <div>
-                            <h3 class="text-lg font-medium text-gray-700">{{ __('العلب المعلقة') }}</h3>
+                            <h3 class="text-lg font-medium text-gray-700">{{ __('العلب قيد المعالجة') }}</h3>
                             <p class="mt-2 text-3xl font-bold text-gray-900">{{ $boxStats['pending'] }}</p>
                         </div>
                         <div class="bg-yellow-100 p-3 rounded-lg">
@@ -95,7 +95,7 @@
                             <div class="p-6">
                                 <div class="flex justify-between items-center mb-4">
                                     <h4 class="font-medium text-gray-700">{{ __('أفضل الموظفين') }}</h4>
-                                    <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">العلب المعتمدة</span>
+                                    <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">العلب المعالجة</span>
                                 </div>
                                 <div class="space-y-4">
                                     @foreach($performanceStats['top_performers'] as $user)
@@ -127,7 +127,7 @@
                             <div class="p-6">
                                 <div class="flex justify-between items-center mb-4">
                                     <h4 class="font-medium text-gray-700">{{ __('أقل الموظفين إنتاجية') }}</h4>
-                                    <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">العلب المعلقة</span>
+                                    <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">العلب قيد المعالجة</span>
                                 </div>
                                 <div class="space-y-4">
                                     @foreach($performanceStats['slow_performers'] as $user)
@@ -177,7 +177,7 @@
                                                 علبة رقم {{ $activity->box_number }}
                                             </p>
                                             <span class="text-xs px-2 py-1 rounded-full bg-{{ $activity->isValidated() ? 'green' : 'yellow' }}-100 text-{{ $activity->isValidated() ? 'green' : 'yellow' }}-800">
-                                                {{ $activity->isValidated() ? 'معتمدة' : 'معلقة' }}
+                                                {{ $activity->isValidated() ? 'المعالجة' : 'قيد المعالجة' }}
                                             </span>
                                         </div>
                                         <p class="text-sm text-gray-500 mt-1">
@@ -260,7 +260,7 @@
                     <!-- Validation Status Chart -->
                     <div class="bg-white rounded-xl shadow overflow-hidden">
                         <div class="p-6 border-b border-gray-200">
-                            <h3 class="text-lg font-medium text-gray-900">{{ __('حالة الاعتماد') }}</h3>
+                            <h3 class="text-lg font-medium text-gray-900">{{ __('حالة المعالجة') }}</h3>
                         </div>
                         <div class="p-6">
                             <div class="h-64">
@@ -274,14 +274,14 @@
     </div>
 
     @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const ctx = document.getElementById('validationChart').getContext('2d');
             const chart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['معتمدة', 'معلقة'],
+                    labels: ['المعالجة', 'قيد المعالجة'],
                     datasets: [{
                         data: [{{ $boxStats['validated'] }}, {{ $boxStats['pending'] }}],
                         backgroundColor: [

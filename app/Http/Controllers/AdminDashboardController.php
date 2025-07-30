@@ -73,7 +73,7 @@ class AdminDashboardController extends Controller
                 $query->whereNotNull('validated_at');
             }])
             ->paginate(5, ['*'], 'tribunal_page');
-
+            
         // Recent activity
         $recentActivity = Box::with(['user', 'validator', 'tribunal'])
             ->orderBy('created_at', 'desc')

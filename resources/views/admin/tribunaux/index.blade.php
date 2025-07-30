@@ -8,7 +8,7 @@
     <div class="py-6 max-w-7xl mx-auto sm:px-6 lg:px-8">
         <!-- Search Form -->
         <form method="GET" action="{{ route('admin.tribunaux.index') }}" class="bg-white mb-2 p-6 rounded-xl shadow space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">اسم المحكمة</label>
                     <input type="text" name="tribunal" placeholder="اسم المحكمة"
@@ -31,6 +31,12 @@
                         <option value="1" {{ request('active') === '1' ? 'selected' : '' }}>{{ __('مفعّل') }}</option>
                         <option value="0" {{ request('active') === '0' ? 'selected' : '' }}>{{ __('غير مفعّل') }}</option>
                     </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">مراكز الحفظ</label>
+                    <input type="text" name="centres_de_conservation" value="{{ request('centres_de_conservation') }}"
+                        class="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" />
                 </div>
 
                 <div class="flex items-end">
@@ -59,6 +65,9 @@
                                 {{ __('الدائرة القضائية') }}
                             </th>
                             <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                {{ __('مركز الحفظ') }}
+                            </th>
+                            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 {{ __('الحالة') }}
                             </th>
                         </tr>
@@ -71,6 +80,7 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">{{ $tribunal->tribunal }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap">{{ $tribunal->circonscription_judiciaire }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ $tribunal->centres_de_conservation }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @if($tribunal->active)
                                         <span class="text-green-600 font-semibold">{{ __('مفعّل') }}</span>
@@ -94,10 +104,24 @@
         </form>
     </div>
 
+    @push('scripts')
     <script>
         document.getElementById('select-all').addEventListener('click', function(e){
             const checkboxes = document.querySelectorAll('input[name="ids[]"]');
             checkboxes.forEach(cb => cb.checked = e.target.checked);
         });
     </script>
+        @if (session('success'))
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'نجاح',
+                        text: '{{ session('success') }}',
+                        confirmButtonText: 'حسناً'
+                    });
+                });
+            </script>
+        @endif
+    @endpush
 </x-app-layout>

@@ -20,6 +20,9 @@ class TribunalController extends Controller
         if ($request->filled('active')) {
             $query->where('active', $request->active);
         }
+        if ($request->filled('centres_de_conservation')) {
+            $query->where('centres_de_conservation', 'like', '%' . $request->centres_de_conservation . '%');
+        }
 
         $tribunaux = $query->paginate(10);
 
