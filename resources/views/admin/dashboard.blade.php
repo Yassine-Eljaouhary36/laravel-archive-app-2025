@@ -156,6 +156,40 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Tribunal Statistics -->
+                    <div class="bg-white rounded-xl shadow overflow-hidden">
+                        <div class="p-6 border-b border-gray-200">
+                            <h3 class="text-lg font-medium text-gray-900">{{ __('توزيع العلب حسب المحكمة') }}</h3>
+                        </div>
+                        <div class="p-6">
+                            <div class="space-y-4">
+                                @foreach($tribunalStats as $tribunal)
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span class="font-medium text-gray-700">{{ $tribunal->tribunal }}</span>
+                                        <span class="font-bold text-indigo-600">{{ $tribunal->validated_boxes_count }} ({{ round(($tribunal->validated_boxes_count / $boxStats['validated']) * 100, 1) }}%)</span>
+                                    </div>
+                                    <div class="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+                                        <div class="h-full bg-indigo-500 rounded-full" 
+                                             style="width: {{ ($tribunal->validated_boxes_count / $boxStats['validated']) * 100 }}%"></div>
+                                    </div>
+                                </div>
+                                @endforeach
+                            </div>
+                            <div class="mt-4">
+                                {{ $tribunalStats->links() }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-start mt-4">
+                        <a href="{{ route('admin.statistics.index') }}" 
+                        class="inline-flex items-center px-4 py-2 bg-orange-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                            <x-heroicon-s-chart-bar class="ml-2 h-7 w-7 inline"/>
+                            {{ __('إحصائيات مفصلة') }}
+                        </a>
+                    </div>
                 </div>
 
                 <!-- Right Column -->
@@ -191,32 +225,6 @@
                                 <span>أكبر علبة: {{ $fileStats['largest_box']->files_count }} ملف ({{ $fileStats['largest_box']->box_number }})</span>
                             </div>
                             @endif
-                        </div>
-                    </div>
-                    
-                    <!-- Tribunal Statistics -->
-                    <div class="bg-white rounded-xl shadow overflow-hidden">
-                        <div class="p-6 border-b border-gray-200">
-                            <h3 class="text-lg font-medium text-gray-900">{{ __('توزيع العلب حسب المحكمة') }}</h3>
-                        </div>
-                        <div class="p-6">
-                            <div class="space-y-4">
-                                @foreach($tribunalStats as $tribunal)
-                                <div>
-                                    <div class="flex justify-between text-sm mb-1">
-                                        <span class="font-medium text-gray-700">{{ $tribunal->tribunal }}</span>
-                                        <span class="font-bold text-indigo-600">{{ $tribunal->validated_boxes_count }} ({{ round(($tribunal->validated_boxes_count / $boxStats['validated']) * 100, 1) }}%)</span>
-                                    </div>
-                                    <div class="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-                                        <div class="h-full bg-indigo-500 rounded-full" 
-                                             style="width: {{ ($tribunal->validated_boxes_count / $boxStats['validated']) * 100 }}%"></div>
-                                    </div>
-                                </div>
-                                @endforeach
-                            </div>
-                            <div class="mt-4">
-                                {{ $tribunalStats->links() }}
-                            </div>
                         </div>
                     </div>
 

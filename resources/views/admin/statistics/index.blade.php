@@ -3,7 +3,7 @@
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             <x-heroicon-s-chart-bar class="ml-2 h-7 w-7 inline"/>
-            {{ __('إحصائيات التصديق') }}
+            {{ __('إحصائيات مفصلة') }}
         </h2>
     </x-slot>
 
@@ -66,6 +66,12 @@
                         <a href="{{ route('admin.statistics.index') }}" style="margin-right: 20px" class="px-5 py-2 rounded border-4 border-dashed text-gray-500 border-gray-500 hover:border-orange-500 hover:text-orange-500 flex items-center gap-2">
                             <x-heroicon-o-arrow-path class="h-5 w-5" style="stroke-width: 2.5;"/>
                         </a>
+
+                        {{-- <a href="{{ route('admin.statistics.export', request()->query()) }}" 
+                        class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                            <x-heroicon-s-document-arrow-down class="ml-2 h-5 w-5 inline"/>
+                            {{ __('تصدير PDF') }}
+                        </a> --}}
                     </div>
                 </div>
             </form>
