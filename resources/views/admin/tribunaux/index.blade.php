@@ -65,9 +65,6 @@
                                 {{ __('الدائرة القضائية') }}
                             </th>
                             <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                {{ __('مركز الحفظ') }}
-                            </th>
-                            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 {{ __('الحالة') }}
                             </th>
                         </tr>
@@ -80,7 +77,6 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">{{ $tribunal->tribunal }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap">{{ $tribunal->circonscription_judiciaire }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">{{ $tribunal->centres_de_conservation }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @if($tribunal->active)
                                         <span class="text-green-600 font-semibold">{{ __('مفعّل') }}</span>
