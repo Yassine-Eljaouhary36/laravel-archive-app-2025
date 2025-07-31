@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\DB;
 use App\Exports\BoxFilesExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Mpdf\Mpdf;
+use Mpdf\Config\ConfigVariables;
+use Mpdf\Config\FontVariables;
 
 class BoxController extends Controller
 {
@@ -281,5 +284,46 @@ class BoxController extends Controller
         $fileName = $box->type.'_' . $box->box_number . '.xlsx';
         
         return Excel::download(new BoxFilesExport($box), $fileName);
+    }
+
+
+    public function generateBoxLabelPdf($id)
+    {
+        $box = Box::with(['tribunal', 'savingBase'])->findOrFail($id);
+
+        $defaultConfig = (new ConfigVariables())->getDefaults();
+        $fontDirs = $defaultConfig['fontDir'];
+        
+        $defaultFontConfig = (new FontVariables())->getDefaults();
+        $fontData = $defaultFontConfig['fontdata'];
+
+        $mpdf = new Mpdf([
+            'mode' => 'utf-8',
+            'format' => [150, 150], // Width, Height in mm (adjust as needed)
+            'orientation' => 'L', // Landscape orientation
+            'direction' => 'rtl',
+            'fontDir' => array_merge($fontDirs, [storage_path('fonts')]),
+            'fontdata' => $fontData + [
+                'xbriyaz' => [
+                    'R' => 'XB Riyaz.ttf',
+                    'B' => 'XB RiyazBd.ttf',
+                    'useOTL' => 0xFF,
+                    'useKashida' => 75,
+                ]
+            ],
+            'default_font' => 'xbriyaz',
+            'margin_left' => 5,
+            'margin_right' => 5,
+            'margin_top' => 5,
+            'margin_bottom' => 5,
+            'margin_header' => 0,
+            'margin_footer' => 0,
+        ]);
+
+        $html = view('boxes.pdf', compact('box'))->render();
+        
+        $mpdf->WriteHTML($html);
+        
+        return $mpdf->Output('box-label-'.$box->box_number.'.pdf', 'I');
     }
 }

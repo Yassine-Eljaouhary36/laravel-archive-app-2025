@@ -57,22 +57,26 @@
                     </div>
                     
                     <!-- Action Buttons -->
-                    <div class="flex items-end space-x-2">
-                        <button type="submit" class="px-5 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 flex items-center gap-2">
-                            <x-heroicon-o-funnel class="h-5 w-5"/>
+                    <div class="flex items-center space-x-4">
+                        <!-- Filter Button -->
+                        <button type="submit" class="px-5 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors duration-200 flex items-center gap-2">
+                            <x-heroicon-o-funnel class="h-5 w-5" />
                             {{ __('تصفية') }}
                         </button>
-                        
-                        <a href="{{ route('admin.statistics.index') }}" style="margin-right: 20px" class="px-5 py-2 rounded border-4 border-dashed text-gray-500 border-gray-500 hover:border-orange-500 hover:text-orange-500 flex items-center gap-2">
-                            <x-heroicon-o-arrow-path class="h-5 w-5" style="stroke-width: 2.5;"/>
+
+                        <!-- Export Button -->
+                        <a href="{{ route('admin.statistics.export', request()->query()) }}" style="margin-right: 20px" class="px-5 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors duration-200 flex items-center gap-2">
+                            <x-heroicon-s-document-arrow-down class="h-5 w-5" />
+                            {{ __('PDF') }}
                         </a>
 
-                        {{-- <a href="{{ route('admin.statistics.export', request()->query()) }}" 
-                        class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                            <x-heroicon-s-document-arrow-down class="ml-2 h-5 w-5 inline"/>
-                            {{ __('تصدير PDF') }}
-                        </a> --}}
+                        <!-- Reset Button -->
+                        <a href="{{ route('admin.statistics.index') }}" class="px-4 py-2 rounded-lg border-2 border-dashed border-gray-400 text-gray-500 hover:border-orange-500 hover:text-orange-500 transition-colors duration-200 flex items-center gap-2">
+                            <x-heroicon-o-arrow-path class="h-5 w-5 stroke-2" />
+                        </a>
+                        
                     </div>
+
                 </div>
             </form>
 

@@ -8,7 +8,6 @@
         "php": "^8.1",
         "afatmustafa/blade-hugeicons": "^1.0",
         "andreiio/blade-remix-icon": "^3.6",
-        "barryvdh/laravel-dompdf": "^3.1",
         "blade-ui-kit/blade-heroicons": "^2.6",
         "blade-ui-kit/blade-icons": "^1.8",
         "blade-ui-kit/blade-zondicons": "^1.6",
@@ -17,6 +16,7 @@
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
         "maatwebsite/excel": "^3.1",
+        "mpdf/mpdf": "^8.2",
         "spatie/laravel-permission": "^6.20"
     },
     "require-dev": {

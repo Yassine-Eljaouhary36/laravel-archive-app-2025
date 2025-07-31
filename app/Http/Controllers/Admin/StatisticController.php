@@ -7,7 +7,9 @@ use App\Models\Box;
 use App\Models\Tribunal;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
-use Barryvdh\DomPDF\Facade\Pdf;
+use Mpdf\Mpdf;
+use Mpdf\Config\ConfigVariables;
+use Mpdf\Config\FontVariables;
 
 class StatisticController extends Controller
 {
@@ -109,31 +111,51 @@ class StatisticController extends Controller
         $filters = [
             'date_from' => $request->date_from,
             'date_to' => $request->date_to,
-            'tribunal' => $request->tribunal_id ? Tribunal::find($request->tribunal_id)->name : 'All',
-            'year' => $request->year_of_judgment ?: 'All'
+            'tribunal' => $request->tribunal_id ? Tribunal::find($request->tribunal_id)->tribunal : 'الكل',
+            'year' => $request->year_of_judgment ?: 'الكل'
         ];
 
-        // Generate PDF
-        $pdf = Pdf::loadView('admin.statistics.pdf', compact(
+        // Font configuration
+        $defaultConfig = (new ConfigVariables())->getDefaults();
+        $fontDirs = $defaultConfig['fontDir'];
+        
+        $defaultFontConfig = (new FontVariables())->getDefaults();
+        $fontData = $defaultFontConfig['fontdata'];
+
+        $mpdf = new Mpdf([
+            'mode' => 'utf-8',
+            'format' => 'A4',
+            'direction' => 'rtl',
+            'fontDir' => array_merge($fontDirs, [
+                storage_path('fonts'),
+            ]),
+            'fontdata' => $fontData + [
+                'xbriyaz' => [  // Using XB Riyaz font
+                    'R' => 'XB Riyaz.ttf',
+                    'B' => 'XB RiyazBd.ttf',
+                    'useOTL' => 0xFF,
+                    'useKashida' => 75,
+                ]
+            ],
+            'default_font' => 'xbriyaz',
+            'autoScriptToLang' => true,
+            'autoLangToFont' => true,
+            'margin_top' => 20,
+            'margin_right' => 15,
+            'margin_left' => 15,
+            'margin_bottom' => 20,
+        ]);
+
+        // HTML content
+        $html = view('admin.statistics.pdf', compact(
             'statsByType',
             'totalStats',
             'filters'
-        ));
+        ))->render();
 
-        // Set paper orientation and font
-        $pdf->setPaper('A4', 'portrait');
-        $pdf->setOption([
-            'isHtml5ParserEnabled' => true,
-            'isRemoteEnabled' => true,
-            'defaultFont' => 'DejaVu Sans',
-            'isPhpEnabled' => true,
-            'isFontSubsettingEnabled' => true,
-            'dpi' => 96,
-            'fontHeightRatio' => 1.1
-        ]);
-
-        $filename = 'تقرير-الإحصائيات-' . now()->format('Y-m-d') . '.pdf'; 
-            // Return for download
-        return $pdf->download($filename);
+        $mpdf->WriteHTML($html);
+        
+        $filename = 'تقرير-الإحصائيات-' . now()->format('Y-m-d') . '.pdf';
+        return $mpdf->Output($filename, 'D');
     }
 }

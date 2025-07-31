@@ -30,6 +30,11 @@
                             class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 ml-4">
                                 <i class="fas fa-file-excel mr-2"></i> تصدير إلى Excel
                             </a>
+
+                            <a href="{{ route('boxes.label', $box) }}"target="_blank" style="margin-right: 20px" class="px-5 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors duration-200 flex items-center gap-2">
+                                <x-heroicon-s-document-arrow-down class="h-5 w-5" />
+                                {{ __('PDF') }}
+                            </a>
                         @endif
                     </div>
 
@@ -59,7 +64,7 @@
                                         </tr>
                                         <tr class="border-b">
                                             <th class="py-2 px-4 font-semibold text-gray-900">رقم قاعدة الحفظ</th>
-                                            <td class="py-2 px-4 text-gray-700">{{ $box->savingBase->number }}</td>
+                                            <td class="py-2 px-4 text-gray-700">{{ $box->savingBase->number ?? 'غير محددة' }}</td>
                                         </tr>
                                         <tr class="border-b bg-gray-50">
                                             <th class="py-2 px-4 font-semibold text-gray-900">رقم العلبة </th>
@@ -91,7 +96,7 @@
                                         </tr>
                                         <tr class="border-b bg-gray-50">
                                             <th class="py-2 px-4 font-semibold text-gray-900">سنة الحكم</th>
-                                            <td class="py-2 px-4 text-gray-700">{{ $box->year_of_judgment }}</td>
+                                            <td class="py-2 px-4 text-gray-700">{{ $box->year_of_judgment ?? 'غير محددة' }}</td>
                                         </tr>
                                         <tr class="border-b">
                                             <th class="py-2 px-4 font-semibold text-gray-900">عدد الملفات</th>

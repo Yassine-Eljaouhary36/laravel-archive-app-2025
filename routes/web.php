@@ -89,8 +89,8 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
 
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
     Route::get('/statistics', [StatisticController::class, 'index'])->name('admin.statistics.index');
-    // Route::get('/admin/statistics/export', [StatisticController::class, 'exportPDF'])
-    // ->name('admin.statistics.export');
+    Route::get('/statistics/export', [StatisticController::class, 'exportPDF'])
+    ->name('admin.statistics.export');
 
     Route::get('/latest-activities', [AdminDashboardController::class, 'latestActivities'])->name('admin.latestActivities');
 
@@ -108,6 +108,9 @@ Route::prefix('controller')->middleware(['auth', 'role:controller'])->group(func
 Route::get('/boxes/{box}/export', [BoxController::class, 'export'])
     ->middleware(['auth', 'role:admin|controller'])
     ->name('boxes.export');
+Route::get('/boxes/{box}/label', [BoxController::class, 'generateBoxLabelPdf'])
+    ->middleware(['auth', 'role:admin|controller'])
+     ->name('boxes.label');
 
 
 // Regular user dashboard (no prefix)
