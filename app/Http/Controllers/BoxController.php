@@ -209,14 +209,27 @@ class BoxController extends Controller
                     if (array_key_exists('id', $fileData)) {
                         // Update existing file
                         $file = File::find($fileData['id']);
+
+                        if (!is_null($validated['year_of_judgment'])) {
+                            // Parse original judgment date
+                            $date = \Carbon\Carbon::parse($fileData['judgment_date']);
+                            
+                            // Set the year to the validated judgment year
+                            $date->year($validated['year_of_judgment']);
+                            
+                            // Save it back to fileData
+                            $fileData['judgment_date'] = $date->toDateString();
+                        }
+
                         $file->update([
                             'file_number' => $fileData['file_number'],
                             'symbol' => $fileData['symbol'],
                             'year_of_opening' => $fileData['year_of_opening'],
                             'judgment_number' => $fileData['judgment_number'],
-                            'judgment_date' => \Carbon\Carbon::parse($fileData['judgment_date'])->year($validated['year_of_judgment'])->toDateString(),
+                            'judgment_date' => $fileData['judgment_date'],
                             'remark' => $fileData['remark'] ?? null,
                         ]);
+
                         $existingFileIds[] = $file->id;
                     } else {
                         // Create new file
