@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('تفاصيل الصندوق') }}
+            {{ __('تفاصيل العلبة ') }}
         </h2>
     </x-slot>
 
@@ -11,7 +11,7 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
                 <div class="p-6 bg-white border-b border-gray-200">
                     <div class="flex justify-between items-start mb-4">
-                        <h3 class="text-lg font-medium">معلومات الصندوق</h3>
+                        <h3 class="text-lg font-medium">معلومات العلبة </h3>
                         
                         @can('validate', $box)
                             <form action="{{ route('boxes.validate', $box) }}" method="POST">
@@ -19,7 +19,7 @@
                                 @if(!$box->isValidated())
                                     <button type="submit" name="validated" value="1" class="inline-flex items-center gap-2 px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-400">
                                         <x-heroicon-s-check-circle class="w-6 h-6" />
-                                        تم التحقق من الصندوق
+                                        تم التحقق من العلبة 
                                     </button>
 
                                 @endif
@@ -36,7 +36,7 @@
                     <!-- Validation Warning -->
                     @if($box->isValidated())
                         <div class="mb-4 p-3 bg-yellow-300 text-black-800 rounded-lg">
-                            <i class="fas fa-lock mr-2"></i> هذا الصندوق تم التحقق منه ولا يمكن تعديله
+                            <i class="fas fa-lock mr-2"></i> هذا العلبة  تم التحقق منه ولا يمكن تعديله
                         </div>
                         <button type="button" class="cursor-not-allowed" disabled>
                             <span class="mr-5">تم التحقق بواسطة :</span>
@@ -59,10 +59,10 @@
                                         </tr>
                                         <tr class="border-b">
                                             <th class="py-2 px-4 font-semibold text-gray-900">رقم قاعدة الحفظ</th>
-                                            <td class="py-2 px-4 text-gray-700">{{ $box->saving_base_number }}</td>
+                                            <td class="py-2 px-4 text-gray-700">{{ $box->savingBase->number }}</td>
                                         </tr>
                                         <tr class="border-b bg-gray-50">
-                                            <th class="py-2 px-4 font-semibold text-gray-900">رقم الصندوق</th>
+                                            <th class="py-2 px-4 font-semibold text-gray-900">رقم العلبة </th>
                                             <td class="py-2 px-4 text-gray-700">{{ $box->box_number }}</td>
                                         </tr>
                                         <tr class="border-b">
@@ -128,7 +128,7 @@
             <!-- Files Table Card -->
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
-                    <h3 class="text-lg font-medium mb-4">الملفات في هذا الصندوق ({{ $files->total() }})</h3>
+                    <h3 class="text-lg font-medium mb-4">الملفات في هذا العلبة  ({{ $files->total() }})</h3>
                     
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
@@ -169,4 +169,19 @@
             </div>
         </div>
     </div>
+
+    @push('scripts')
+        @if (session('success'))
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'نجاح',
+                        text: '{{ session('success') }}',
+                        confirmButtonText: 'حسناً'
+                    });
+                });
+            </script>
+        @endif
+    @endpush
 </x-app-layout>

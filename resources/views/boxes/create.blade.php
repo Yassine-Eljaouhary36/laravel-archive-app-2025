@@ -16,7 +16,7 @@
                                         
                             <!-- Box Information Section -->
                             <div class="mb-6 p-4 border rounded-lg">
-                                <h3 class="text-lg font-medium text-gray-900 mb-4">{{ __('معلومات الصندوق') }}</h3>
+                                <h3 class="text-lg font-medium text-gray-900 mb-4">{{ __('معلومات العلبة ') }}</h3>
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
                                     <div>
@@ -33,22 +33,26 @@
                                     </div>
 
                                     <div>
-                                        <x-input-label for="saving_base_number" :value="__('رقم قاعدة الحفظ')" />
+                                        <x-input-label for="saving_base_id" :value="__('رقم قاعدة الحفظ')" />
                                         <div class="relative mt-1">
                                             <input type="text" id="search_input" class="block w-full rounded-lg border-gray-300" placeholder="{{ __('ابحث هنا...') }}" autocomplete="off">
-                                            <select id="saving_base_number" name="saving_base_number" class="hidden" required>
-                                                <option value="">{{ __('اختر رقم قاعدة الحفظ') }}</option>
+                                            <select id="saving_base_id" name="saving_base_id" class="hidden" required>
+                                                <option value="">{{ __('اختر قاعدة الحفظ') }}</option>
                                                 @foreach($savingBases as $base)
-                                                    <option value="{{ $base->number }}" {{ old('saving_base_number') == $base->number ? 'selected' : '' }}>
-                                                        {{ $base->number }} @if($base->description) {{ $base->description }}@endif
+                                                    <option value="{{ $base->id }}" 
+                                                            data-file-type="{{ $base->fileType->name ?? '' }}"
+                                                            {{ old('saving_base_id') == $base->id ? 'selected' : '' }}>
+                                                        {{ $base->number }} 
+                                                        @if($base->description) - {{ $base->description }}@endif
+                                                        @if($base->fileType) ({{ $base->fileType->name }})@endif
                                                     </option>
                                                 @endforeach
                                             </select>
-                                            
                                             <div id="dropdown_options" class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg hidden max-h-60 overflow-auto"></div>
                                         </div>
-                                        <x-input-error :messages="$errors->get('saving_base_number')" class="mt-2" />
+                                        <x-input-error :messages="$errors->get('saving_base_id')" class="mt-2" />
                                     </div>
+
                                     <!-- File Type -->
                                     <div>
                                         <x-input-label for="file_type" :value="__('المصلحة')" />
@@ -62,21 +66,15 @@
 
                                     <div>
                                         <x-input-label for="type" :value="__(' نوع الملفات')" />
-                                        <select id="type" name="type" class="block mt-1 w-full rounded-lg" required>
-                                            <option value="">{{ __(' نوع الملفات') }}</option>
-                                            @foreach($types as $type)
-                                                <option value="{{ $type->name }}" {{ old('type') == $type->name ? 'selected' : '' }}>
-                                                    {{ $type->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
+                                        <input type="text" id="type" name="type"  readonly
+                                            class="block mt-1 w-full rounded-lg bg-gray-100 border-gray-300">
                                         <x-input-error :messages="$errors->get('type')" class="mt-2" />
                                     </div>
                                                 
                                     <!-- Year of Judgment -->
                                     <div>
                                         <x-input-label for="year_of_judgment" :value="__('سنة الحكم')" />
-                                        <x-text-input id="year_of_judgment" class="block mt-1 w-full" type="number" name="year_of_judgment" :value="old('year_of_judgment')" required />
+                                        <x-text-input id="year_of_judgment" class="block mt-1 w-full" type="number" name="year_of_judgment" :value="old('year_of_judgment')" />
                                         <x-input-error :messages="$errors->get('year_of_judgment')" class="mt-2" />
                                     </div>
                                 </div>
@@ -184,7 +182,7 @@
                                 </a>
                                             
                                 <x-primary-button class="mr-3" style="background-color: rgb(100, 191, 100)">
-                                    {{ __('حفظ الصندوق مع الملفات') }}
+                                    {{ __('حفظ العلبة  مع الملفات') }}
                                 </x-primary-button>
                             </div>
                         </form>
@@ -246,7 +244,7 @@
                 };
 
                 // Get year of judgment value
-                const savingBaseNumber = document.getElementById('saving_base_number').value.trim();
+                const savingBaseNumber = document.getElementById('saving_base_id').value.trim();
                 const typeOfFile = document.getElementById('file_type').value.trim();
                 const yearOfJudgment = document.getElementById('year_of_judgment').value.trim();
                 const typeFile = document.getElementById('type').value.trim();
@@ -274,10 +272,6 @@
                     errorMessages.push('المصلحة');
                     isValid = false;
                 }
-                if (!yearOfJudgment) {
-                    errorMessages.push('سنة الحكم');
-                    isValid = false;
-                }
                 if (!typeFile) {
                     errorMessages.push('نوع الملفات');
                     isValid = false;
@@ -297,10 +291,14 @@
                     errorMessages.push('سنة فتح الملف مطلوبة');
                     isValid = false;
                 }
-
-                if (!fileData.judgment_date) {
-                    errorMessages.push('تاريخ الحكم مطلوب');
-                    isValid = false;
+                if(yearOfJudgment){
+                    if (!fileData.judgment_date) {
+                        errorMessages.push('تاريخ الحكم مطلوب');
+                        isValid = false;
+                    }else if (new Date(fileData.judgment_date).getFullYear() !== parseInt(yearOfJudgment)) {
+                        errorMessages.push('سنة الحكم لا تطابق السنة المحددة');
+                        isValid = false;
+                    }
                 }
 
                 // Validate year of opening is before or equal to year of judgment
@@ -453,7 +451,7 @@
             document.addEventListener('DOMContentLoaded', function() {
                 updateFilesTable();
                 const searchInput = document.getElementById('search_input');
-                const originalSelect = document.getElementById('saving_base_number');
+                const originalSelect = document.getElementById('saving_base_id');
                 const dropdownOptions = document.getElementById('dropdown_options');
                 
                 // Create dropdown options from select element
@@ -481,6 +479,11 @@
                         optionElement.dataset.value = option.value;
                         
                         optionElement.addEventListener('click', () => {
+                            const fileTypeName = option.getAttribute('data-file-type');
+        
+                            // Set the type field based on the saving base's file type
+                            document.getElementById('type').value = fileTypeName;
+
                             originalSelect.value = option.value;
                             searchInput.value = option.text;
                             dropdownOptions.classList.add('hidden');

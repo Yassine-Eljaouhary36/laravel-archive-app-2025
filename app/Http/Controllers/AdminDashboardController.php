@@ -25,18 +25,25 @@ class AdminDashboardController extends Controller
         ];
 
         // Add File statistics
+        $validatedBoxFileQuery = File::whereHas('box', function ($q) {
+            $q->whereNotNull('validated_at');
+        });
+
         $fileStats = [
-            'total' => File::count(),
-            'today' => File::whereDate('created_at', Carbon::today())->count(),
-            'this_week' => File::whereBetween('created_at', 
+            'total' => $validatedBoxFileQuery->count(),
+            'today' => (clone $validatedBoxFileQuery)->whereDate('created_at', Carbon::today())->count(),
+            'this_week' => (clone $validatedBoxFileQuery)->whereBetween('created_at', 
                 [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->count(),
             'avg_per_box' => Box::withCount('files')
-                        ->having('files_count', '>', 0)
-                        ->avg('files_count'),
+                ->whereNotNull('validated_at')
+                ->having('files_count', '>', 0)
+                ->avg('files_count'),
             'largest_box' => Box::withCount('files')
-                        ->orderBy('files_count', 'desc')
-                        ->first()
+                ->whereNotNull('validated_at')
+                ->orderBy('files_count', 'desc')
+                ->first()
         ];
+
         // User statistics
         $userStats = [
             'total' => User::count(),
@@ -66,27 +73,17 @@ class AdminDashboardController extends Controller
         ];
 
         // Tribunal statistics
-        $tribunalStats = Tribunal::withCount('boxes')
-            ->having('boxes_count', '>', 0)
-            ->orderBy('boxes_count', 'desc')
-            ->with(['boxes' => function($query) {
-                $query->whereNotNull('validated_at');
-            }])
+      $tribunalStats = Tribunal::withCount('validatedBoxes')
+            ->having('validated_boxes_count', '>', 0)
+            ->orderBy('validated_boxes_count', 'desc')
             ->paginate(5, ['*'], 'tribunal_page');
             
-        // Recent activity
-        $recentActivity = Box::with(['user', 'validator', 'tribunal'])
-            ->orderBy('created_at', 'desc')
-            ->limit(10)
-            ->get();
-
         return view('admin.dashboard', compact(
             'boxStats',
             'fileStats',
             'userStats',
             'performanceStats',
             'tribunalStats',
-            'recentActivity'
         ));
     }
 
@@ -104,5 +101,16 @@ class AdminDashboardController extends Controller
             ->selectRaw('AVG(TIMESTAMPDIFF(HOUR, created_at, validated_at)) as avg_hours')
             ->first()
             ->avg_hours;
+    }
+
+    public function latestActivities(){
+        // Recent activity
+        $recentActivity = Box::with(['user', 'validator', 'tribunal'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        return view('admin.latestActivities', compact(
+            'recentActivity'
+        ));
     }
 }

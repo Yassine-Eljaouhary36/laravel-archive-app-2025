@@ -12,25 +12,25 @@
                     <!-- نموذج البحث -->
                 <form method="GET" action="{{ route('boxes.index') }}" class="mb-6">
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <!-- البحث برقم العلبة -->
+                        <!-- Box Number -->
                         <div>
-                            <label for="box_number" class="block text-sm font-medium text-gray-700">رقم العلبة</label>
-                            <input type="text" name="box_number" id="box_number" 
+                            <x-input-label for="box_number" :value="__('رقم العلبة')" />
+                            <x-text-input type="text" name="box_number" id="box_number" 
                                 value="{{ request('box_number') }}"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                class="mt-1 block w-full"/>
                         </div>
                         
-                        <!-- البحث بسنة الحكم -->
+                        <!-- Year of Judgment -->
                         <div>
-                            <label for="year_of_judgment" class="block text-sm font-medium text-gray-700">سنة الحكم</label>
-                            <input type="number" name="year_of_judgment" id="year_of_judgment" 
+                            <x-input-label for="year_of_judgment" :value="__('سنة الحكم')" />
+                            <x-text-input type="number" name="year_of_judgment" id="year_of_judgment" 
                                 value="{{ request('year_of_judgment') }}"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                class="mt-1 block w-full"/>
                         </div>
                         
-                        <!-- نوع الملف -->
+                        <!-- File Type -->
                         <div>
-                            <label for="file_type" class="block text-sm font-medium text-gray-700">المصلحة</label>
+                            <x-input-label for="file_type" :value="__('المصلحة')" />
                             <select name="file_type" id="file_type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                 <option value="">كل الأنواع</option>
                                 <option value="الرئاسة" {{ request('file_type') == 'الرئاسة' ? 'selected' : '' }}>الرئاسة</option>
@@ -38,9 +38,43 @@
                             </select>
                         </div>
                         
-                        <!-- أزرار البحث وإعادة التعيين -->
+                        <!-- Type -->
+                        <div>
+                            <x-input-label for="type" :value="__('نوع الملفات')" />
+                            <select name="type" id="type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                                <option value="">كل الأنواع</option>
+                                @foreach($types as $type)
+                                    <option value="{{ $type->name }}" {{ request('type') == $type->name ? 'selected' : '' }}>
+                                        {{ $type->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        
+                        <!-- Tribunal -->
+                        <div>
+                            <x-input-label for="tribunal_id" :value="__('المحكمة')" />
+                            <select name="tribunal_id" id="tribunal_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                                <option value="">كل المحاكم</option>
+                                @foreach($tribunals as $tribunal)
+                                    <option value="{{ $tribunal->id }}" {{ request('tribunal_id') == $tribunal->id ? 'selected' : '' }}>
+                                        {{ $tribunal->tribunal }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div>
+                            <x-input-label for="validated" :value="__('حالة التحقق')" />
+                            <select name="validated" id="validated" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                                <option value="">الكل</option>
+                                <option value="1" {{ request('validated') === '1' ? 'selected' : '' }}>تم التحقق</option>
+                                <option value="0" {{ request('validated') === '0' ? 'selected' : '' }}>لم يتم التحقق</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Search and Reset Buttons -->
                         <div class="flex items-end space-x-2">
-                            <!-- زر البحث -->
                             <button type="submit" style="width: 80px;  justify-content: center; " class="px-5 py-2 bg-green-500 text-white rounded hover:bg-blue-600 flex items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" />
@@ -91,7 +125,9 @@
                                 @foreach($boxes as $box)
                                 <tr>
                                     <td class="px-4 py-4 whitespace-nowrap">{{ $box->box_number }}</td>
-                                    <td class="px-4 py-4 whitespace-nowrap">{{ $box->saving_base_number }}</td>
+                                    <td class="px-4 py-4 whitespace-nowrap">
+                                        {{ $box->savingBase->number ?? $box->saving_base_number }}
+                                    </td>
                                     <td class="px-4 py-4 whitespace-nowrap">{{ $box->file_type }}</td>
                                     <td class="px-4 py-4 whitespace-nowrap">{{ $box->type }}</td>
                                     <td class="px-4 py-4 whitespace-nowrap">{{ $box->tribunal->tribunal ?? '' }}</td>

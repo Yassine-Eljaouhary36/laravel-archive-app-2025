@@ -19,14 +19,14 @@
                         
                         <!-- Validated Boxes -->
                         <div class="bg-white p-6 rounded-lg shadow-xl border-2 border-green-200">
-                            <h3 class="font-semibold text-lg text-gray-800">{{ __('معتمدة') }}</h3>
+                            <h3 class="font-semibold text-lg text-gray-800">{{ __('المعالجة') }}</h3>
                             <p class="text-3xl font-bold text-green-600">{{ $validated }}</p>
-                            <p class="text-sm text-gray-500 mt-1">{{ __('معدل الاعتماد') }}: {{ $validation_rate }}%</p>
+                            <p class="text-sm text-gray-500 mt-1">{{ __('معدل المعالجة') }}: {{ $validation_rate }}%</p>
                         </div>
                         
                         <!-- Pending Boxes -->
                         <div class="bg-white p-6 rounded-lg shadow-xl border-2 border-yellow-200">
-                            <h3 class="font-semibold text-lg text-gray-800">{{ __('معلقة') }}</h3>
+                            <h3 class="font-semibold text-lg text-gray-800">{{ __('قيد المعالجة') }}</h3>
                             <p class="text-3xl font-bold text-yellow-600">{{ $pending }}</p>
                         </div>
                         
@@ -74,7 +74,7 @@
                                             </a>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                            {{ $box->tribunal->name ?? __('غير محدد') }}
+                                            {{ $box->tribunal->tribunal ?? __('غير محدد') }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                             {{ $box->created_at->translatedFormat('Y-m-d h:i A') }}
@@ -82,7 +82,7 @@
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             @if($box->isValidated())
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                                {{ __('معتمدة') }}
+                                                {{ __('معالجة') }}
                                                 @if($box->validator)
                                                 <br><small class="text-xs">{{ __('بواسطة') }}: {{ $box->validator->name }}</small>
                                                 @endif

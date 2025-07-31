@@ -23,4 +23,10 @@ class Tribunal extends Model
         return $this->hasMany(Box::class);
     }
 
+    public function validatedBoxes()
+    {
+        return $this->hasMany(Box::class)->whereNotNull('validated_at');
+    }
+
+
 }

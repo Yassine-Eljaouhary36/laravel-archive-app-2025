@@ -10,7 +10,8 @@ class Box extends Model
     use HasFactory;
 
     protected $fillable = [
-        'saving_base_number',
+        'saving_base_id', // Add this
+        // 'saving_base_number',
         'box_number',
         'file_type',
         'type',
@@ -23,6 +24,12 @@ class Box extends Model
     ];
 
     protected $dates = ['validated_at', 'created_at'];
+
+    // Add this relationship
+    public function savingBase()
+    {
+        return $this->belongsTo(SavingBase::class);
+    }
 
     public function files()
     {

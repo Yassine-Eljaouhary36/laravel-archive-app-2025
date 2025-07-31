@@ -6,6 +6,7 @@ use App\Http\Controllers\BoxController;
 use App\Http\Controllers\ControllerDashboardController;
 use App\Http\Controllers\FileTypeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Admin\StatisticController;
 use App\Http\Controllers\TransfertController;
 use App\Http\Controllers\TribunalController;
 use App\Http\Controllers\UserDashboardController;
@@ -87,6 +88,8 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     Route::put('/transferts/{transfert}', [TransfertController::class, 'update'])->name('admin.transferts.update');
 
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+    Route::get('/statistics', [StatisticController::class, 'index'])->name('admin.statistics.index');
+    Route::get('/latest-activities', [AdminDashboardController::class, 'latestActivities'])->name('admin.latestActivities');
 
 });
 

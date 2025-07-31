@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-           {{ __('تعديل الصندوق') }}
+           {{ __('تعديل العلبة ') }}
         </h2>
     </x-slot>
 
@@ -36,7 +36,7 @@
                                 </div>
 
                                 <!-- Saving Base Number -->
-                                <div>
+                                {{-- <div>
                                     <x-input-label for="saving_base_number" :value="__('رقم قاعدة الحفظ')" />
                                         <div class="relative mt-1">
                                             <input type="text" id="search_input" class="block w-full rounded-lg border-gray-300" placeholder="{{ __('ابحث هنا...') }}" autocomplete="off">
@@ -56,8 +56,31 @@
                                             <div id="dropdown_options" class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg hidden max-h-60 overflow-auto"></div>
                                         </div>
                                     <x-input-error :messages="$errors->get('saving_base_number')" class="mt-2" />
-                                </div>
+                                </div> --}}
 
+                                <!-- Saving Base Selection -->
+                                <div>
+                                    <x-input-label for="saving_base_id" :value="__('قاعدة الحفظ')" />
+                                    <div class="relative mt-1">
+                                        <input type="text" id="search_input" class="block w-full rounded-lg border-gray-300" 
+                                            placeholder="{{ __('ابحث هنا...') }}" autocomplete="off"
+                                            value="{{ $box->savingBase ? $box->savingBase->number : $box->saving_base_number }}">
+                                        <select id="saving_base_id" name="saving_base_id" class="hidden" required>
+                                            <option value="">{{ __('اختر قاعدة الحفظ') }}</option>
+                                            @foreach($savingBases as $base)
+                                                <option value="{{ $base->id }}" 
+                                                        data-file-type="{{ $base->fileType->name ?? '' }}"
+                                                        {{ old('saving_base_id', $box->saving_base_id) == $base->id ? 'selected' : '' }}>
+                                                    {{ $base->number }} 
+                                                    @if($base->description) - {{ $base->description }}@endif
+                                                    @if($base->fileType) ({{ $base->fileType->name }})@endif
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <div id="dropdown_options" class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg hidden max-h-60 overflow-auto"></div>
+                                    </div>
+                                    <x-input-error :messages="$errors->get('saving_base_id')" class="mt-2" />
+                                </div>
                                 <!-- File Type -->
                                 <div>
                                     <x-input-label for="file_type" :value="__('المصلحة')" />
@@ -69,7 +92,7 @@
                                     <x-input-error :messages="$errors->get('file_type')" class="mt-2" />
                                 </div>
 
-                                <div>
+                                {{-- <div>
                                     <x-input-label for="type" :value="__(' نوع الملفات')" />
                                     <select id="type" name="type" class="block mt-1 w-full rounded-lg" required>
                                         <option value="">{{ __(' نوع الملفات') }}</option>
@@ -82,7 +105,14 @@
                                         @endforeach
                                     </select>
                                     <x-input-error :messages="$errors->get('type')" class="mt-2" />
-                                </div>
+                                </div> --}}
+
+                                    <div>
+                                        <x-input-label for="type" :value="__(' نوع الملفات')" />
+                                        <input type="text" id="type" name="type" value="{{old('type', $box->type)}}" readonly
+                                            class="block mt-1 w-full rounded-lg bg-gray-100 border-gray-300">
+                                        <x-input-error :messages="$errors->get('type')" class="mt-2" />
+                                    </div>
 
                                 <!-- Year of Judgment -->
                                 <div>
@@ -262,7 +292,7 @@
             };
 
             // Get year of judgment value
-            const savingBaseNumber = document.getElementById('saving_base_number').value.trim();
+            const savingBaseNumber = document.getElementById('saving_base_id').value.trim();
             const typeOfFile = document.getElementById('file_type').value.trim();
             const yearOfJudgment = document.getElementById('year_of_judgment').value.trim();
             const typeFile = document.getElementById('type').value.trim();
@@ -290,10 +320,6 @@
                 errorMessages.push('المصلحة');
                 isValid = false;
             }
-            if (!yearOfJudgment) {
-                errorMessages.push('سنة الحكم');
-                isValid = false;
-            }
             if (!typeFile) {
                 errorMessages.push('نوع الملفات');
                 isValid = false;
@@ -314,9 +340,14 @@
                 isValid = false;
             }
 
-            if (!fileData.judgment_date) {
-                errorMessages.push('تاريخ الحكم مطلوب');
-                isValid = false;
+            if(yearOfJudgment){
+                if (!fileData.judgment_date) {
+                    errorMessages.push('تاريخ الحكم مطلوب');
+                    isValid = false;
+                }else if (new Date(fileData.judgment_date).getFullYear() !== parseInt(yearOfJudgment)) {
+                    errorMessages.push('سنة الحكم لا تطابق السنة المحددة');
+                    isValid = false;
+                }
             }
 
             // Validate year of opening is before or equal to year of judgment
@@ -478,7 +509,7 @@
             updateFilesTable();
             updateHiddenInputs();
             const searchInput = document.getElementById('search_input');
-            const originalSelect = document.getElementById('saving_base_number');
+            const originalSelect = document.getElementById('saving_base_id');
             const dropdownOptions = document.getElementById('dropdown_options');
                 
             // Create dropdown options from select element
@@ -506,6 +537,10 @@
                     optionElement.dataset.value = option.value;
                         
                     optionElement.addEventListener('click', () => {
+                        const fileTypeName = option.getAttribute('data-file-type');
+        
+                        // Set the type field based on the saving base's file type
+                        document.getElementById('type').value = fileTypeName;
                         originalSelect.value = option.value;
                         searchInput.value = option.text;
                         dropdownOptions.classList.add('hidden');

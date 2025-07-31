@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('saving_bases', function (Blueprint $table) {
             $table->id();
             $table->string('number');
-            $table->string('description');
+            $table->text('description');
             $table->timestamps();
         });
     }

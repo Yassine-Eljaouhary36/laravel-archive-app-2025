@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class BoxController extends Controller
 {
+
     public function index(Request $request)
     {
         $boxes = Box::query()
@@ -23,32 +24,52 @@ class BoxController extends Controller
             ->when(!auth()->user()->hasRole(['admin', 'controller']), function ($query) {
                 return $query->where('user_id', auth()->id());
             })
-            // Existing search filters
+            // Search by box number
             ->when($request->box_number, function ($query, $box_number) {
                 return $query->where('box_number', 'like', '%'.$box_number.'%');
             })
+            // Search by year of judgment
             ->when($request->year_of_judgment, function ($query, $year) {
                 return $query->where('year_of_judgment', $year);
             })
+            // Search by file type
             ->when($request->file_type, function ($query, $file_type) {
                 return $query->where('file_type', $file_type);
             })
-            // Additional features
-            ->with(['user' => function($query) {  // Eager load user relationship
-                $query->select('id', 'name');    // Only get necessary fields
-            }])
+            // Search by type
+            ->when($request->type, function ($query, $type) {
+                return $query->where('type', $type);
+            })
+            // Search by tribunal
+            ->when($request->tribunal_id, function ($query, $tribunal_id) {
+                return $query->where('tribunal_id', $tribunal_id);
+            })
+            ->when($request->has('validated'), function ($query) use ($request) {
+                if ($request->validated === '1') {
+                    return $query->whereNotNull('validated_at');
+                } elseif ($request->validated === '0') {
+                    return $query->whereNull('validated_at');
+                }
+            })
+            // Eager load relationships with only needed columns
+            ->with(['user:id,name', 'tribunal:id,tribunal', 'savingBase:id,number,description'])
             ->withCount('files')
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        return view('boxes.index', compact('boxes'));
+        // Get filter data for the form
+        $tribunals = Tribunal::where('active', true)->get(['id', 'tribunal']);
+        $types = FileType::all();
+
+        return view('boxes.index', compact('boxes', 'tribunals', 'types'));
     }
 
     public function create()
     {
         return view('boxes.create', [
-            'savingBases' => SavingBase::all(),
-            'types' => FileType::where('active', true)->get(), // Only active file types
+            'savingBases' => SavingBase::whereHas('fileType', function($query) {
+                    $query->where('active', true);
+                 })->get(),
             'tribunaux' => Tribunal::where('active', true)->get()
         ]);
     }
@@ -56,17 +77,17 @@ class BoxController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'saving_base_number' => 'required|string|max:255',
+            'saving_base_id' => 'required|exists:saving_bases,id',
             'file_type' => 'required|string|max:255',
             'type' => 'required|string|max:255',
             'tribunal_id' => 'required|exists:tribunaux,id',
-            'year_of_judgment' => 'required|integer|min:1900|max:' . (date('Y') + 1),
+            'year_of_judgment' => 'nullable|integer|min:1900|max:' . (date('Y') + 1),
             'files' => 'required|array',
             'files.*.file_number' => 'required|string|max:10',
             'files.*.symbol' => 'required|string|max:10',
             'files.*.year_of_opening' => 'required|integer|min:1900|max:' . (date('Y') + 1),
             'files.*.judgment_number' => 'nullable|string|max:10',
-            'files.*.judgment_date' => 'required|date',
+            'files.*.judgment_date' => 'nullable|date',
             'files.*.remark' => 'nullable|string', // Add this line
         ]);
 
@@ -77,7 +98,7 @@ class BoxController extends Controller
         $next = is_numeric($max) ? $max + 1 : 1;
 
         $box = Box::create([
-            'saving_base_number' => $validated['saving_base_number'],
+            'saving_base_id' => $validated['saving_base_id'],
             'box_number' => $next,
             'file_type' => $validated['file_type'],
             'type' => $validated['type'],
@@ -90,13 +111,15 @@ class BoxController extends Controller
         // Add order to each file
         $order = 1;
         foreach ($validated['files'] as $fileData) {
-            // Parse original date
-            $date = \Carbon\Carbon::parse($fileData['judgment_date']);
 
-            // Set the year from box judgment year
-            $date->year($validated['year_of_judgment']);
-
-            $fileData['judgment_date'] = $date->toDateString();
+            if (!is_null($validated['year_of_judgment'])) {
+                // Parse original date
+                $date = \Carbon\Carbon::parse($fileData['judgment_date']);
+                // Set the year from box judgment year
+                $date->year($validated['year_of_judgment']);
+                $fileData['judgment_date'] = $date->toDateString();
+            }
+            
             $fileData['order'] = $order++;
             $fileData['remark'] = $fileData['remark'] ?? null; // Add this line
 
@@ -122,12 +145,11 @@ class BoxController extends Controller
     public function edit(Box $box)
     {
         $this->authorize('update', $box);
-        $savingBases = SavingBase::all();
-        $types = FileType::all();
+        $savingBases = SavingBase::whereHas('fileType', fn($q) => $q->where('active', true))->get();
         $tribunaux = Tribunal::where('active', true)->get();
 
         $box->load('files');
-        return view('boxes.edit', compact('box','savingBases','types','tribunaux'));
+        return view('boxes.edit', compact('box','savingBases','tribunaux'));
     }
 
 
@@ -136,18 +158,18 @@ class BoxController extends Controller
         $this->authorize('update', $box);
 
         $validated = $request->validate([
-            'saving_base_number' => 'required|string|max:255',
+            'saving_base_id' => 'required|exists:saving_bases,id',
             'file_type' => 'required|string|max:255',
             'type' => 'required|string|max:255',
             'tribunal_id' => 'required|exists:tribunaux,id',
-            'year_of_judgment' => 'required|integer|min:1900|max:' . (date('Y') + 1),
+            'year_of_judgment' => 'nullable|integer|min:1900|max:' . (date('Y') + 1),
             'files' => 'required|array',
             'files.*.id' => 'nullable|integer|exists:files,id',
             'files.*.file_number' => 'required|string|max:255',
             'files.*.symbol' => 'required|string|max:255',
             'files.*.year_of_opening' => 'required|integer|min:1900|max:' . (date('Y') + 1),
             'files.*.judgment_number' => 'nullable|string|max:255',
-            'files.*.judgment_date' => 'required|date',
+            'files.*.judgment_date' => 'nullable|date',
             'files.*.remark' => 'nullable|string', // Add this line
         ]);
 
@@ -164,7 +186,7 @@ class BoxController extends Controller
         DB::transaction(function () use ($validated, $box) {
             // Update box information
             $box->update([
-                'saving_base_number' => $validated['saving_base_number'],
+                'saving_base_id' => $validated['saving_base_id'],
                 'file_type' => $validated['file_type'],
                 'type' => $validated['type'],
                 'year_of_judgment' => $validated['year_of_judgment'],
@@ -234,7 +256,7 @@ class BoxController extends Controller
         });
 
         $message = $request->validated 
-            ? 'Box validated successfully' 
+            ? 'تم التحقق من صحة الصندوق بنجاح'
             : 'Box validation removed';
         
         return back()->with('success', $message);
@@ -244,6 +266,7 @@ class BoxController extends Controller
     public function export(Box $box): BinaryFileResponse
     {
         $box->load('files'); // if you need the files relation
+        $box->load('savingBase'); // if you need the files relation
         
         // Check if box is validated
         if (!$box->isValidated()) {
@@ -255,7 +278,7 @@ class BoxController extends Controller
             abort(403);
         }
         
-        $fileName = 'box_' . $box->box_number . '_files.xlsx';
+        $fileName = $box->type.'_' . $box->box_number . '.xlsx';
         
         return Excel::download(new BoxFilesExport($box), $fileName);
     }

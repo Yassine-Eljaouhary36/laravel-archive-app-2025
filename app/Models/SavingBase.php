@@ -9,8 +9,22 @@ class SavingBase extends Model
 {
     use HasFactory;
 
-        protected $fillable = [
-            'number',
-            'description'
-        ];
+    protected $fillable = [
+        'number',
+        'description',
+        'file_type_id'
+    ];
+
+
+    public function fileType()
+    {
+        return $this->belongsTo(FileType::class);
+    }
+
+    // Add this relationship
+    public function boxes()
+    {
+        return $this->hasMany(Box::class);
+    }
+
 }

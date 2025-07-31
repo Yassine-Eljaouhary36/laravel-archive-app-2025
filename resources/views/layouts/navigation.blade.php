@@ -14,7 +14,7 @@
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         <x-ri-dashboard-horizontal-line class="ml-2 mr-2 h-5 w-5 inline"/>
-                        {{ __('لوحة التحكم') }}
+                        {{ __('لوحة القيادة') }}
                     </x-nav-link>
                 </div>
                 
@@ -34,6 +34,10 @@
                     <x-nav-link :href="route('admin.transferts.index')" :active="request()->routeIs('admin.transferts.*')">
                         <x-heroicon-s-arrow-right-circle class="ml-2 mr-2 h-5 w-5 inline"/>
                         {{ __('إدارة التحويلات') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('admin.latestActivities')" :active="request()->routeIs('admin.latestActivities')">
+                        <x-heroicon-s-clock class="ml-2 mr-2 h-5 w-5 inline"/>
+                        {{ __('أحدث الأنشطة') }}
                     </x-nav-link>
                 @endif
 

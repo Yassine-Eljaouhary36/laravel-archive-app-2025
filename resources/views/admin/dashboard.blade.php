@@ -156,43 +156,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Recent Activity -->
-                    <div class="bg-white rounded-xl shadow overflow-hidden">
-                        <div class="p-6 border-b border-gray-200">
-                            <h3 class="text-lg font-medium text-gray-900">{{ __('النشاط الأخير') }}</h3>
-                        </div>
-                        <div class="divide-y divide-gray-200">
-                            @foreach($recentActivity as $activity)
-                            <div class="p-6 hover:bg-gray-50 transition-colors duration-150">
-                                <div class="flex items-start">
-                                    <div class="flex-shrink-0">
-                                        <div class="h-10 w-10 rounded-full bg-{{ $activity->isValidated() ? 'green' : 'yellow' }}-100 flex items-center justify-center">
-                                            <x-heroicon-o-archive-box class="h-5 w-5 text-{{ $activity->isValidated() ? 'green' : 'yellow' }}-500"/>
-                                        </div>
-                                    </div>
-                                    <div class="ml-4 flex-1">
-                                        <div class="flex items-center justify-between">
-                                            <p class="text-sm font-medium text-gray-900">
-                                                علبة رقم {{ $activity->box_number }}
-                                            </p>
-                                            <span class="text-xs px-2 py-1 rounded-full bg-{{ $activity->isValidated() ? 'green' : 'yellow' }}-100 text-{{ $activity->isValidated() ? 'green' : 'yellow' }}-800">
-                                                {{ $activity->isValidated() ? 'المعالجة' : 'قيد المعالجة' }}
-                                            </span>
-                                        </div>
-                                        <p class="text-sm text-gray-500 mt-1">
-                                            {{ $activity->user->name }} • 
-                                            {{ $activity->created_at->diffForHumans() }}
-                                            @if($activity->isValidated())
-                                            • تم الاعتماد بواسطة {{ $activity->validator->name }}
-                                            @endif
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                            @endforeach
-                        </div>
-                    </div>
                 </div>
 
                 <!-- Right Column -->
@@ -242,11 +205,11 @@
                                 <div>
                                     <div class="flex justify-between text-sm mb-1">
                                         <span class="font-medium text-gray-700">{{ $tribunal->tribunal }}</span>
-                                        <span class="font-bold text-indigo-600">{{ $tribunal->boxes_count }} ({{ round(($tribunal->boxes_count / $boxStats['total']) * 100, 1) }}%)</span>
+                                        <span class="font-bold text-indigo-600">{{ $tribunal->validated_boxes_count }} ({{ round(($tribunal->validated_boxes_count / $boxStats['validated']) * 100, 1) }}%)</span>
                                     </div>
                                     <div class="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
                                         <div class="h-full bg-indigo-500 rounded-full" 
-                                             style="width: {{ ($tribunal->boxes_count / $boxStats['total']) * 100 }}%"></div>
+                                             style="width: {{ ($tribunal->validated_boxes_count / $boxStats['validated']) * 100 }}%"></div>
                                     </div>
                                 </div>
                                 @endforeach

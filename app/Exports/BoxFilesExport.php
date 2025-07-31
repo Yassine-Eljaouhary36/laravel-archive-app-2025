@@ -31,10 +31,10 @@ class BoxFilesExport implements FromCollection, WithHeadings, WithStyles, WithDr
                 'B' => $file->file_number,                     // رقم الملف
                 'C' => $file->year_of_opening,                 // سنة فتح الملف
                 'D' => $file->symbol,                          // رمز الملف
-                'E' => $file->judgment_number ?? '',           // رقم الحكم
+                'E' => $file->judgment_number ?? 'غير متوفر',           // رقم الحكم
                 'F' => $file->judgment_date 
                     ? \Carbon\Carbon::parse($file->judgment_date)->format('Y-m-d')
-                    : '',                                      // تاريخ الحكم
+                    : 'غير متوفر',                                      // تاريخ الحكم
                 'G' => $file->remark ?? ''                                      // ملاحظات
             ];
         });
@@ -100,7 +100,7 @@ class BoxFilesExport implements FromCollection, WithHeadings, WithStyles, WithDr
         // ======= BOX INFORMATION SECTION ========
 
         $sheet->mergeCells('A3:G3');
-        $sheet->setCellValue('A3', 'جرد تفصيلي للملفات المحالة من '.($this->box->tribunal->tribunal ?? '').' إلى المركز الجهوي للحفظ ( '.($this->box->tribunal->centres_de_conservation ?? '').')');
+        $sheet->setCellValue('A3', 'جرد تفصيلي للملفات المحالة على المركز الجهوي للحفظ');
         $sheet->getStyle('A3:G3')->applyFromArray($this->getInfoCellStyle());
 
         // Court Information (A2|B2)
@@ -114,7 +114,7 @@ class BoxFilesExport implements FromCollection, WithHeadings, WithStyles, WithDr
         $sheet->setCellValue('E5', 'رقم قاعدة الحفظ: ');
         $sheet->getStyle('E5')->applyFromArray($this->getInfoCellStyle());
         $sheet->mergeCells('F5:G5');
-        $sheet->setCellValue('F5', $this->box->saving_base_number);
+        $sheet->setCellValue('F5', $this->box->savingBase->number);
         $sheet->getStyle('F5:G5')->applyFromArray($this->getInfoCellStyle());
 
         // File Type (A3|B3)
@@ -151,7 +151,7 @@ class BoxFilesExport implements FromCollection, WithHeadings, WithStyles, WithDr
         $sheet->setCellValue('A8', 'سنة الحكم: ');
         $sheet->getStyle('A8')->applyFromArray($this->getInfoCellStyle());
         $sheet->mergeCells('B8:C8');
-        $sheet->setCellValue('B8',$this->box->year_of_judgment);
+        $sheet->setCellValue('B8',$this->box->year_of_judgment ?? 'غير متوفر');
         $sheet->getStyle('B8:C8')->applyFromArray($this->getInfoCellStyle());
 
         // Empty space for balance (C5:D5)

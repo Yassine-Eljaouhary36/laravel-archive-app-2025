@@ -3,24 +3,96 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Box;
 use App\Models\File;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Option 1: Using whereDoesntHave
-        $users = User::whereDoesntHave('roles', function($query) {
-                    $query->where('name', 'admin');
+        // Get all roles except 'admin'
+        $roles = Role::where('name', '!=', 'admin')->pluck('name');
+        
+        // Base query for non-admin users
+        $query = User::with(['roles'])
+            ->whereDoesntHave('roles', function($q) {
+                $q->where('name', 'admin');
+            })
+            ->withCount([
+                'boxes as boxes_validated_count' => function($q) use ($request) {
+                    $q->whereNotNull('validated_at');
+                    if ($request->filled(['date_from', 'date_to'])) {
+                        $dateFrom = Carbon::parse($request->date_from)->startOfDay();
+                        $dateTo = Carbon::parse($request->date_to)->endOfDay();
+                        
+                        $q->whereBetween('validated_at', [$dateFrom, $dateTo]);
+                    }
+                }
+            ])
+            ->with(['boxes' => function($q) use ($request) {
+                $q->whereNotNull('validated_at');
+                if ($request->filled(['date_from', 'date_to'])) {
+                    $dateFrom = Carbon::parse($request->date_from)->startOfDay();
+                    $dateTo = Carbon::parse($request->date_to)->endOfDay();
+                    
+                    $q->whereBetween('validated_at', [$dateFrom, $dateTo]);
+                }
+                $q->withCount('files');
+            }]);
+        
+        // Apply role filter if provided
+        if ($request->filled('role')) {
+            $query->whereHas('roles', function($q) use ($request) {
+                $q->where('name', $request->role);
+            });
+        }
+        
+        // Get and process results
+        $users = $query->get()
+            ->each(function($user) {
+                $user->valid_files_count = $user->boxes->sum('files_count');
+            })
+            ->sortByDesc('valid_files_count');
+        
+
+        // Get performance metrics data
+        $metrics = [
+            'total_users' => User::whereDoesntHave('roles', fn($q) => $q->where('name', 'admin'))->count(),
+            'active_users' => User::where('is_active', true)->whereDoesntHave('roles', fn($q) => $q->where('name', 'admin'))->count(),
+            'total_validated_boxes' => Box::whereNotNull('validated_at')->when($request->filled(['date_from', 'date_to']), function($q) use ($request) {
+                $dateFrom = Carbon::parse($request->date_from)->startOfDay();
+                $dateTo = Carbon::parse($request->date_to)->endOfDay();
+                $q->whereBetween('validated_at', [$dateFrom, $dateTo]);
+            })->count(),
+            'total_validated_files' => Box::whereNotNull('validated_at')
+                ->when($request->filled(['date_from', 'date_to']), function($q) use ($request) {
+                    $dateFrom = Carbon::parse($request->date_from)->startOfDay();
+                    $dateTo = Carbon::parse($request->date_to)->endOfDay();
+                    $q->whereBetween('validated_at', [$dateFrom, $dateTo]);
                 })
-                ->paginate(10);
-                
-        return view('admin.users.index', compact('users'));
+                ->withCount('files')
+                ->get()
+                ->sum('files_count'),
+        ];
+            
+        // Paginate results
+        $page = request('page', 1);
+        $perPage = 10;
+        $users = new LengthAwarePaginator(
+            $users->forPage($page, $perPage),
+            $users->count(),
+            $perPage,
+            $page,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+        
+        return view('admin.users.index', compact('users', 'roles', 'metrics'));
     }
 
     public function create()
@@ -145,8 +217,8 @@ class UserController extends Controller
         
         // Get and merge actual data
         $boxesAddedData = $user->boxes()
-            ->selectRaw('DAYOFWEEK(created_at) as day, COUNT(*) as count')
-            ->whereBetween('created_at', [$startDate, $endDate])
+            ->selectRaw('DAYOFWEEK(updated_at) as day, COUNT(*) as count')
+            ->whereBetween('updated_at', [$startDate, $endDate])
             ->groupBy('day')
             ->pluck('count', 'day')
             ->toArray();

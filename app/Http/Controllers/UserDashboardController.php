@@ -46,6 +46,7 @@ class UserDashboardController extends Controller
     protected function getUserFilesCount($userId)
     {
         return Box::where('user_id', $userId)
+            ->whereNotNull('validated_at')
             ->withCount('files')
             ->get()
             ->sum('files_count');
@@ -54,6 +55,7 @@ class UserDashboardController extends Controller
     protected function getTribunalDistribution($userId)
     {
         return Box::where('user_id', $userId)
+            ->whereNotNull('validated_at')
             ->with('tribunal')
             ->get()
             ->groupBy('tribunal.tribunal')

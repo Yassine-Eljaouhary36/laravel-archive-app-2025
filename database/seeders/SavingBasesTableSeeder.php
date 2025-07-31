@@ -15,6 +15,7 @@ class SavingBasesTableSeeder extends Seeder
     public function run(): void
     {
 
+        DB::table('saving_bases')->truncate();
 
         $path = database_path('data/saving_bases.csv');
         if (!file_exists($path)) {
@@ -29,6 +30,7 @@ class SavingBasesTableSeeder extends Seeder
             DB::table('saving_bases')->insert([
                 'number' => $data[0],
                 'description' => $data[1],
+                'file_type_id' =>  null,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
