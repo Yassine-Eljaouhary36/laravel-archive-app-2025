@@ -111,7 +111,7 @@
                                                 
                                         <!-- Symbol -->
                                         <div>
-                                            <x-input-label for="symbol"  >{{__('رمز الملف')}}<span class="text-red-500 font-bold">*</span></x-input-label>
+                                            <x-input-label for="symbol"  >{{__('رمز الملف')}}</x-input-label>
                                             <x-text-input id="symbol" class="block mt-1 w-full" type="text" name="symbol" />
                                         </div>
                                                 
@@ -283,10 +283,10 @@
                     isValid = false;
                 }
 
-                if (!fileData.symbol) {
-                    errorMessages.push('رمز الملف مطلوب');
-                    isValid = false;
-                }
+                // if (!fileData.symbol) {
+                //     errorMessages.push('رمز الملف مطلوب');
+                //     isValid = false;
+                // }
 
                 if (!fileData.year_of_opening) {
                     errorMessages.push('سنة فتح الملف مطلوبة');

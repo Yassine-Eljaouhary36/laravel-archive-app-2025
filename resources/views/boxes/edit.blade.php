@@ -80,7 +80,7 @@
                                 <div>
                                     <x-input-label for="year_of_judgment" :value="__('سنة الحكم')" />
                                     <x-text-input id="year_of_judgment" class="block mt-1 w-full" type="number" 
-                                        name="year_of_judgment" :value="old('year_of_judgment', $box->year_of_judgment)" required />
+                                        name="year_of_judgment" :value="old('year_of_judgment', $box->year_of_judgment)"/>
                                     <x-input-error :messages="$errors->get('year_of_judgment')" class="mt-2" />
                                 </div>
                             </div>
@@ -115,7 +115,7 @@
                                     
                                     <!-- Symbol -->
                                     <div>
-                                        <x-input-label for="symbol" >{{__('رمز الملف')}}<span class="text-red-500 font-bold">*</span></x-input-label>
+                                        <x-input-label for="symbol" >{{__('رمز الملف')}}</x-input-label>
                                         <x-text-input id="symbol" class="block mt-1 w-full" type="text" name="symbol" />
                                     </div>
                                     
@@ -293,10 +293,10 @@
                 isValid = false;
             }
 
-            if (!fileData.symbol) {
-                errorMessages.push('رمز الملف مطلوب');
-                isValid = false;
-            }
+            // if (!fileData.symbol) {
+            //     errorMessages.push('رمز الملف مطلوب');
+            //     isValid = false;
+            // }
 
             if (!fileData.year_of_opening) {
                 errorMessages.push('سنة فتح الملف مطلوبة');
