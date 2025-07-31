@@ -23,7 +23,7 @@
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <!-- Tribunal -->
                                 <div>
-                                    <x-input-label for="tribunal_id" :value="__('المحكمة')" />
+                                    <x-input-label for="tribunal_id" >{{__('المحكمة')}}<span class="text-red-500 font-bold">*</span></x-input-label>
                                     <select id="tribunal_id" name="tribunal_id" class="block mt-1 w-full rounded-lg" required>
                                         <option value="">{{ __('اختر المحكمة') }}</option>
                                         @foreach($tribunaux as $tribunal)
@@ -35,32 +35,9 @@
                                     <x-input-error :messages="$errors->get('tribunal_id')" class="mt-2" />
                                 </div>
 
-                                <!-- Saving Base Number -->
-                                {{-- <div>
-                                    <x-input-label for="saving_base_number" :value="__('رقم قاعدة الحفظ')" />
-                                        <div class="relative mt-1">
-                                            <input type="text" id="search_input" class="block w-full rounded-lg border-gray-300" placeholder="{{ __('ابحث هنا...') }}" autocomplete="off">
-                                            <select id="saving_base_number" name="saving_base_number" class="hidden" required>
-                                                <option value="">{{ __('اختر رقم قاعدة الحفظ') }}</option>
-                                                @foreach($savingBases as $base)
-                                                    <option value="{{ $base->number }}" 
-                                                        {{ (old('saving_base_number', $box->saving_base_number) == $base->number) ? 'selected' : '' }}
-                                                       
-                                                        >
-                                                        {{ $base->number }} 
-                                                        @if($base->description)- {{ $base->description }}@endif
-                                                    </option>
-                                                    {{$box->saving_base_number}}
-                                                @endforeach
-                                            </select>
-                                            <div id="dropdown_options" class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg hidden max-h-60 overflow-auto"></div>
-                                        </div>
-                                    <x-input-error :messages="$errors->get('saving_base_number')" class="mt-2" />
-                                </div> --}}
-
                                 <!-- Saving Base Selection -->
                                 <div>
-                                    <x-input-label for="saving_base_id" :value="__('قاعدة الحفظ')" />
+                                    <x-input-label for="saving_base_id"  >{{__('رقم قاعدة الحفظ')}}<span class="text-red-500 font-bold">*</span></x-input-label>
                                     <div class="relative mt-1">
                                         <input type="text" id="search_input" class="block w-full rounded-lg border-gray-300" 
                                             placeholder="{{ __('ابحث هنا...') }}" autocomplete="off"
@@ -83,7 +60,7 @@
                                 </div>
                                 <!-- File Type -->
                                 <div>
-                                    <x-input-label for="file_type" :value="__('المصلحة')" />
+                                    <x-input-label for="file_type"  >{{__('المصلحة')}}<span class="text-red-500 font-bold">*</span></x-input-label>
                                     <select id="file_type" name="file_type" class="block mt-1 w-full rounded-lg" required>
                                         <option value="">{{ __('حدد المصلحة') }}</option>
                                         <option value="الرئاسة" {{ old('file_type', $box->file_type) == 'الرئاسة' ? 'selected' : '' }}>الرئاسة</option>
@@ -92,27 +69,12 @@
                                     <x-input-error :messages="$errors->get('file_type')" class="mt-2" />
                                 </div>
 
-                                {{-- <div>
-                                    <x-input-label for="type" :value="__(' نوع الملفات')" />
-                                    <select id="type" name="type" class="block mt-1 w-full rounded-lg" required>
-                                        <option value="">{{ __(' نوع الملفات') }}</option>
-                                        @foreach($types as $type)
-                                            <option value="{{ $type->name }}" 
-                                                {{ (old('type', $box->type) == $type->name) ? 'selected' : '' }}
-                                                >
-                                                {{ $type->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
+                                <div>
+                                    <x-input-label for="type" >{{__(' نوع الملفات')}}<span class="text-red-500 font-bold">*</span></x-input-label>
+                                    <input type="text" id="type" name="type" value="{{old('type', $box->type)}}" readonly
+                                        class="block mt-1 w-full rounded-lg bg-gray-100 border-gray-300">
                                     <x-input-error :messages="$errors->get('type')" class="mt-2" />
-                                </div> --}}
-
-                                    <div>
-                                        <x-input-label for="type" :value="__(' نوع الملفات')" />
-                                        <input type="text" id="type" name="type" value="{{old('type', $box->type)}}" readonly
-                                            class="block mt-1 w-full rounded-lg bg-gray-100 border-gray-300">
-                                        <x-input-error :messages="$errors->get('type')" class="mt-2" />
-                                    </div>
+                                </div>
 
                                 <!-- Year of Judgment -->
                                 <div>
@@ -127,7 +89,7 @@
                         <!-- Files Section -->
                         <div class="mb-6 p-4 border rounded-lg">
                             <div class="flex justify-between items-center mb-4">
-                                <h3 class="text-lg font-medium text-gray-900">{{ __('الملفات') }}</h3>
+                                <h3 class="text-lg font-medium text-gray-900">{{ __('الملفات') }}<span class="text-red-500 font-bold">*</span></h3>
                                 <x-primary-button type="button" id="addFileBtn" onclick="showFileForm()">
                                     {{ __('إضافة ملف جديد') }} <x-heroicon-o-plus class="ml-2 mr-2 h-5 w-5 inline"/>
                                 </x-primary-button>
@@ -147,19 +109,19 @@
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                     <!-- File Number -->
                                     <div>
-                                        <x-input-label for="file_number" :value="__('رقم الملف')" />
+                                        <x-input-label for="file_number"  >{{__('رقم الملف')}}<span class="text-red-500 font-bold">*</span></x-input-label>
                                         <x-text-input id="file_number" class="block mt-1 w-full" type="text" name="file_number" />
                                     </div>
                                     
                                     <!-- Symbol -->
                                     <div>
-                                        <x-input-label for="symbol" :value="__('رمز الملف')" />
+                                        <x-input-label for="symbol" >{{__('رمز الملف')}}<span class="text-red-500 font-bold">*</span></x-input-label>
                                         <x-text-input id="symbol" class="block mt-1 w-full" type="text" name="symbol" />
                                     </div>
                                     
                                     <!-- Year of Opening -->
                                     <div>
-                                        <x-input-label for="year_of_opening" :value="__('سنة فتح الملف')" />
+                                        <x-input-label for="year_of_opening"  >{{__('سنة فتح الملف')}}<span class="text-red-500 font-bold">*</span></x-input-label>
                                         <x-text-input id="year_of_opening" class="block mt-1 w-full" type="number" name="year_of_opening" />
                                     </div>
                                 </div>
@@ -190,7 +152,7 @@
                                          {{ __('إلغاء') }}
                                     </x-secondary-button>
                                     
-                                    <x-primary-button type="button" onclick="saveFile()" class="ml-3">
+                                    <x-primary-button id="insertFileFataButton" type="button" onclick="saveFile()" class="ml-3">
                                         {{ __('حفظ ') }}
                                     </x-primary-button>
                                 </div>
@@ -263,6 +225,7 @@
         function showFileForm() {
             document.getElementById('fileFormContainer').classList.remove('hidden');
             document.getElementById('fileFormTitle').textContent = 'إضافة ملف جديد';
+            document.getElementById('insertFileFataButton').textContent = 'إضافة الملف ';
             editingIndex = null;
             resetFileForm();
         }
@@ -409,6 +372,7 @@
 
             document.getElementById('fileFormContainer').classList.remove('hidden');
             document.getElementById('fileFormTitle').textContent = 'تعديل الملف';
+            document.getElementById('insertFileFataButton').textContent = 'تعديل الملف ';
             editingIndex = index;
         }
 
