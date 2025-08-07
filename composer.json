@@ -17,6 +17,7 @@
         "laravel/tinker": "^2.8",
         "maatwebsite/excel": "^3.1",
         "mpdf/mpdf": "^8.2",
+        "simplesoftwareio/simple-qrcode": "^4.2",
         "spatie/laravel-permission": "^6.20"
     },
     "require-dev": {

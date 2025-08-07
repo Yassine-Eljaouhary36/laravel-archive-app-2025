@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Mpdf\Mpdf;
 use Mpdf\Config\ConfigVariables;
 use Mpdf\Config\FontVariables;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class BoxController extends Controller
 {
@@ -307,6 +308,10 @@ class BoxController extends Controller
     {
         $box = Box::with(['tribunal', 'savingBase'])->findOrFail($id);
 
+        // Generate QR code data (you can customize this)
+        $qrCodeData = route('boxes.show', $box->id); // Or any other relevant data
+        $qrCode = base64_encode(QrCode::format('svg')->size(100)->generate($qrCodeData));
+
         $defaultConfig = (new ConfigVariables())->getDefaults();
         $fontDirs = $defaultConfig['fontDir'];
         
@@ -336,7 +341,7 @@ class BoxController extends Controller
             'margin_footer' => 0,
         ]);
 
-        $html = view('boxes.pdf', compact('box'))->render();
+        $html = view('boxes.pdf', compact('box', 'qrCode'))->render();
         
         $mpdf->WriteHTML($html);
         
