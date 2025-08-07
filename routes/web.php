@@ -49,7 +49,7 @@ Route::middleware('auth')->group(function () {
         // Optional routes you might need later
         Route::get('/{box}/edit', [BoxController::class, 'edit'])->name('boxes.edit');
         Route::put('/{box}', [BoxController::class, 'update'])->name('boxes.update');
-        // Route::delete('/{box}', [BoxController::class, 'destroy'])->name('boxes.destroy');
+        Route::get('/boxes/exportBoxes', [BoxController::class, 'exportBoxes'])->name('boxes.exportBoxes');
         
     });
 });

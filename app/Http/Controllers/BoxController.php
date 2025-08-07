@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\BoxesExport;
 use App\Http\Requests\ValidateBoxRequest;
 use App\Models\Box;
 use App\Models\File;
@@ -22,6 +23,11 @@ class BoxController extends Controller
 
     public function index(Request $request)
     {
+        // Get distinct years for the filter dropdown
+        $years = Box::selectRaw('DISTINCT year_of_judgment')
+                ->orderBy('year_of_judgment', 'desc')
+                ->pluck('year_of_judgment');
+
         $boxes = Box::query()
             // Apply user-based filtering first
             ->when(!auth()->user()->hasRole(['admin', 'controller']), function ($query) {
@@ -31,9 +37,10 @@ class BoxController extends Controller
             ->when($request->box_number, function ($query, $box_number) {
                 return $query->where('box_number', 'like', '%'.$box_number.'%');
             })
-            // Search by year of judgment
-            ->when($request->year_of_judgment, function ($query, $year) {
-                return $query->where('year_of_judgment', $year);
+            // Search by year(s) of judgment
+            ->when($request->year_of_judgment, function ($query, $years) {
+                $yearsArray = is_array($years) ? $years : [$years];
+                return $query->whereIn('year_of_judgment', $yearsArray);
             })
             // Search by file type
             ->when($request->file_type, function ($query, $file_type) {
@@ -64,7 +71,7 @@ class BoxController extends Controller
         $tribunals = Tribunal::where('active', true)->get(['id', 'tribunal']);
         $types = FileType::all();
 
-        return view('boxes.index', compact('boxes', 'tribunals', 'types'));
+        return view('boxes.index', compact('boxes', 'tribunals', 'types', 'years'));
     }
 
     public function create()
@@ -84,11 +91,11 @@ class BoxController extends Controller
             'file_type' => 'required|string|max:255',
             'type' => 'required|string|max:255',
             'tribunal_id' => 'required|exists:tribunaux,id',
-            'year_of_judgment' => 'nullable|integer|min:1900|max:' . (date('Y') + 1),
+            'year_of_judgment' => 'nullable|integer|min:1900|max:' . date('Y'),
             'files' => 'required|array',
             'files.*.file_number' => 'required|string|max:10',
             'files.*.symbol' => 'nullable|string|max:10',
-            'files.*.year_of_opening' => 'required|integer|min:1900|max:' . (date('Y') + 1),
+            'files.*.year_of_opening' => 'required|integer|min:1900|max:' . date('Y'),
             'files.*.judgment_number' => 'nullable|string|max:10',
             'files.*.judgment_date' => 'nullable|date',
             'files.*.remark' => 'nullable|string', // Add this line
@@ -334,5 +341,10 @@ class BoxController extends Controller
         $mpdf->WriteHTML($html);
         
         return $mpdf->Output('box-label-'.$box->box_number.'.pdf', 'I');
+    }
+
+    public function exportBoxes(Request $request)
+    {
+        return Excel::download(new BoxesExport($request->all()), 'boxes_export.xlsx');
     }
 }

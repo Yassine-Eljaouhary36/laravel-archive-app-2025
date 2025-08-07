@@ -20,12 +20,22 @@
                                 class="mt-1 block w-full"/>
                         </div>
                         
-                        <!-- Year of Judgment -->
+                        <!-- Year of Judgment - Multi-select -->
                         <div>
                             <x-input-label for="year_of_judgment" :value="__('سنة الحكم')" />
-                            <x-text-input type="number" name="year_of_judgment" id="year_of_judgment" 
-                                value="{{ request('year_of_judgment') }}"
-                                class="mt-1 block w-full"/>
+                            <select name="year_of_judgment[]" id="year_of_judgment" multiple
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                @foreach($years as $year)
+                                    <option value="{{ $year }}" 
+                                        @if(is_array(request('year_of_judgment')))
+                                            {{ in_array($year, request('year_of_judgment')) ? 'selected' : '' }}
+                                        @elseif(request('year_of_judgment') == $year)
+                                            selected
+                                        @endif>
+                                        {{ $year }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
                         
                         <!-- File Type -->
@@ -98,6 +108,14 @@
                         <a href="{{ route('boxes.create') }}" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
                             إنشاء علبة جديدة
                             <x-heroicon-o-plus class="ml-2 mr-2 h-5 w-5 inline"/>
+                        </a>
+                    @endif
+                    @if (auth()->user()->hasAnyRole(['admin']))
+                        <a href="{{ route('boxes.exportBoxes', request()->query()) }}" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+                            تصدير إلى Excel
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
                         </a>
                     @endif
                 </div>
@@ -195,5 +213,30 @@
                 });
             </script>
         @endif
+    @endpush
+
+    @push('syles')
+        <style>
+            /* Style for multi-select elements */
+            select[multiple] {
+                height: 20px;
+                background-image: none; /* Remove default arrow */
+                padding: 0.5rem;
+            }
+
+            select[multiple] option {
+                padding: 0.25rem 0.5rem;
+                border-bottom: 1px solid #e5e7eb; /* subtle separator */
+            }
+
+            select[multiple] option:hover {
+                background-color: #f3f4f6;
+            }
+
+            select[multiple] option:checked {
+                background-color: #3b82f6; /* blue-500 */
+                color: white;
+            }
+        </style>
     @endpush
 </x-app-layout>

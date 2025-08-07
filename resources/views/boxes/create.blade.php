@@ -74,7 +74,7 @@
                                     <!-- Year of Judgment -->
                                     <div>
                                         <x-input-label for="year_of_judgment" :value="__('سنة الحكم')" />
-                                        <x-text-input id="year_of_judgment" class="block mt-1 w-full" type="number" name="year_of_judgment" :value="old('year_of_judgment')" />
+                                        <x-text-input id="year_of_judgment" class="block mt-1 w-full" type="number" name="year_of_judgment" :value="old('year_of_judgment')" readonly/>
                                         <x-input-error :messages="$errors->get('year_of_judgment')" class="mt-2" />
                                     </div>
                                 </div>
@@ -86,7 +86,7 @@
                                 <div class="flex justify-between items-center mb-4">
                                     <h3 class="text-lg font-medium text-gray-900">{{ __('الملفات') }} <span class="text-red-500 font-bold">*</span></h3>
                                     <x-primary-button style="background-color: rgb(92, 92, 245)" type="button" id="addFileBtn" onclick="showFileForm()">
-                                        {{ __('إضافة ملف جديد') }} <x-heroicon-o-plus class="ml-2 mr-2 h-5 w-5 inline"/>
+                                        {{ __('إضافة ملفات جديد') }} <x-heroicon-o-plus class="ml-2 mr-2 h-5 w-5 inline"/>
                                     </x-primary-button>
                                 </div>
 
@@ -112,7 +112,7 @@
                                         <!-- Symbol -->
                                         <div>
                                             <x-input-label for="symbol"  >{{__('رمز الملف')}}</x-input-label>
-                                            <x-text-input id="symbol" class="block mt-1 w-full" type="text" name="symbol" />
+                                            <x-text-input id="symbol" class="block mt-1 w-full" type="text" name="symbol" readonly/>
                                         </div>
                                                 
                                         <!-- Year of Opening -->
@@ -126,13 +126,13 @@
                                         <!-- Judgment Number -->
                                         <div>
                                             <x-input-label for="judgment_number" :value="__('رقم الحكم')" />
-                                            <x-text-input id="judgment_number" class="block mt-1 w-full" type="text" name="judgment_number" />
+                                            <x-text-input id="judgment_number" class="block mt-1 w-full" type="text" name="judgment_number" readonly/>
                                         </div>
                                                 
                                         <!-- Judgment Date -->
                                         <div>
                                             <x-input-label for="judgment_date" :value="__('تاريخ الحكم')" />
-                                            <x-text-input id="judgment_date" class="block mt-1 w-full" type="date" name="judgment_date" />
+                                            <x-text-input id="judgment_date" class="block mt-1 w-full" type="date" name="judgment_date" readonly/>
                                         </div>
 
                                         <!-- Remark -->
@@ -216,6 +216,8 @@
                 document.getElementById('fileFormContainer').classList.remove('hidden');
                 document.getElementById('fileFormTitle').textContent = 'إضافة ملف جديد';
                 document.getElementById('insertFileFataButton').textContent = 'إضافة الملف ';
+                document.getElementById('fileFormContainer').style.backgroundColor = '';
+                document.getElementById('file_number').focus();
                 editingIndex = null;
                 resetFileForm();
             }
@@ -250,6 +252,7 @@
                 const yearOfJudgment = document.getElementById('year_of_judgment').value.trim();
                 const typeFile = document.getElementById('type').value.trim();
                 const tribunalId = document.getElementById('tribunal_id').value.trim();
+                const currentYear = new Date().getFullYear();
 
                 // Add remark validation
                 if (fileData.remark && fileData.remark.length > 25) {
@@ -288,8 +291,8 @@
                 //     isValid = false;
                 // }
 
-                if (!fileData.year_of_opening) {
-                    errorMessages.push('سنة فتح الملف مطلوبة');
+                if (!fileData.year_of_opening  || fileData.year_of_opening< 1900 || fileData.year_of_opening > currentYear) {
+                    errorMessages.push(`أدخل سنة صالحة بين 1900 و ${currentYear}`);
                     isValid = false;
                 }
                 if(yearOfJudgment){
@@ -324,7 +327,8 @@
                 if (editingIndex !== null) {
                     // Update existing file
                     files[editingIndex] = fileData;
-                    
+                    hideFileForm()
+                    document.getElementById('fileFormContainer').style.backgroundColor = '';
                     // Show success message for editing
                     Swal.fire({
                         icon: 'success',
@@ -343,12 +347,13 @@
                         title: 'تم الإضافة بنجاح',
                         text: 'تم إضافة الملف الجديد بنجاح',
                         showConfirmButton: false,
-                        timer: 1500
+                        timer: 600
                     });
                 }
+                document.getElementById('file_number').focus();
 
                 updateFilesTable();
-                hideFileForm();
+                resetFileForm();
                 updateHiddenInputs();
             }
 
@@ -364,6 +369,8 @@
                 document.getElementById('fileFormContainer').classList.remove('hidden');
                 document.getElementById('fileFormTitle').textContent = 'تعديل الملف';
                 document.getElementById('insertFileFataButton').textContent = 'تعديل الملف ';
+                document.getElementById('fileFormContainer').style.backgroundColor = 'rgb(255 223 118 / 43%)';
+
                 editingIndex = index;
             }
 

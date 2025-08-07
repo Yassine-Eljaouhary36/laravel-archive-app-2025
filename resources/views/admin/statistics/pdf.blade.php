@@ -37,7 +37,6 @@
             background-color: #f8fafc;
             padding: 10px;
             border-radius: 8px;
-            margin-bottom: 5px;
             border: 1px solid #e2e8f0;
         }
         
@@ -130,46 +129,38 @@
             border-top: 1px solid #e2e8f0;
         }
         .logo {
-            max-height: 80px;
-            max-width: 200px;
-            margin-bottom: 15px;
+            max-height: 200px;
+            width: 700px;
+            margin-bottom: 25px;
+            margin-top: -50px
         }
     </style>
 </head>
 <body>
     <div class="header">
         @if(file_exists(public_path('images/logo.svg')))
-            <img src="{{ public_path('images/logo.svg') }}" class="logo"> 
+            <img src="{{ public_path('images/logo.png') }}" class="logo"> 
         @endif
-        <div class="title">{{ __('تقرير إحصائيات الأرشيف المُعالَج') }}</div>
+        <div class="title">{{ __('إحصائيات حول الأرشيف المُعالَج') }}</div>
         <div>{{ __('تاريخ التقرير: ') }} {{ now()->format('Y-m-d') }}</div>
     </div>
 
     <div class="filters">
-        <div class="filter-item"><strong>{{ __('الفترة:') }}</strong> {{ $filters['date_from'] }} إلى {{ $filters['date_to'] ?: 'الكل' }}</div>
+        <div class="filter-item"><strong>{{ __('الفترة:') }}</strong> {{ $filters['date_from'] }} @isset($filters['date_from'])
+            إلى
+        @endisset  {{ $filters['date_to'] ?: 'الكل' }}</div>
         <div class="filter-item"><strong>{{ __('المحكمة:') }}</strong> {{ $filters['tribunal'] }}</div>
         <div class="filter-item"><strong>{{ __('سنة الحكم:') }}</strong> {{ $filters['year'] }}</div>
     </div>
 
     <div class="summary-cards">
         <div class="card">
-            <div class="card-title">{{ __('إجمالي العلب المعالجة') }}</div>
+            <div class="card-title">{{ __('عدد العلب المعالجة') }}</div>
             <div class="card-value">{{ $totalStats['total_boxes'] }}</div>
         </div>
         <div class="card">
-            <div class="card-title">{{ __('إجمالي الملفات المعالجة') }}</div>
+            <div class="card-title">{{ __('عدد الملفات المعالجة') }}</div>
             <div class="card-value">{{ $totalStats['total_files'] }}</div>
-        </div>
-        <div class="card">
-            <div class="card-title">{{ __('متوسط الملفات لكل علبة') }}</div>
-            <div class="card-value">
-                @php
-                    $average = $totalStats['total_boxes'] > 0 
-                        ? round($totalStats['total_files'] / $totalStats['total_boxes'], 1)
-                        : 0;
-                @endphp
-                {{ $average }}
-            </div>
         </div>
     </div>
 
@@ -178,8 +169,6 @@
         <thead>
             <tr>
                 <th>{{ __('النوع') }}</th>
-                <th>{{ __('عدد العلب') }}</th>
-                <th>{{ __('النسبة') }}</th>
                 <th>{{ __('عدد الملفات') }}</th>
                 <th>{{ __('النسبة') }}</th>
             </tr>
@@ -192,18 +181,10 @@
             
             @forelse($statsByType as $type => $stats)
                 @php
-                    $boxPercentage = round(($stats['total_boxes'] / $totalBoxes) * 100, 1);
                     $filePercentage = round(($stats['total_files'] / $totalFiles) * 100, 1);
                 @endphp
                 <tr>
                     <td>{{ $type }}</td>
-                    <td>{{ $stats['total_boxes'] }}</td>
-                    <td>
-                        {{ $boxPercentage }}%
-                        <div class="percentage-bar">
-                            <div class="percentage-fill" style="width: {{ $boxPercentage }}%"></div>
-                        </div>
-                    </td>
                     <td>{{ $stats['total_files'] }}</td>
                     <td>
                         {{ $filePercentage }}%
@@ -219,10 +200,5 @@
             @endforelse
         </tbody>
     </table>
-
-    <div class="footer">
-        {{ __('تم الإنشاء في: ') }} {{ now()->format('Y-m-d H:i:s') }} | 
-        {{ __('إجمالي الصفحات: ') }} {PAGENO}
-    </div>
 </body>
 </html>
