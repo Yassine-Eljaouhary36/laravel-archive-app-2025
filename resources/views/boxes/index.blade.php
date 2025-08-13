@@ -25,11 +25,10 @@
                             <x-input-label for="year_of_judgment" :value="__('سنة الحكم')" />
                             <select name="year_of_judgment[]" id="year_of_judgment" multiple
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                <option value="">جميع السنوات</option>
                                 @foreach($years as $year)
                                     <option value="{{ $year }}" 
-                                        @if(is_array(request('year_of_judgment')))
-                                            {{ in_array($year, request('year_of_judgment')) ? 'selected' : '' }}
-                                        @elseif(request('year_of_judgment') == $year)
+                                        @if(request()->has('year_of_judgment') && in_array($year, (array)request('year_of_judgment')))
                                             selected
                                         @endif>
                                         {{ $year }}

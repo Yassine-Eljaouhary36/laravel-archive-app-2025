@@ -12,6 +12,7 @@ use App\Models\Tribunal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Exports\BoxFilesExport;
+use App\Imports\BoxImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Mpdf\Mpdf;
@@ -39,9 +40,18 @@ class BoxController extends Controller
                 return $query->where('box_number', 'like', '%'.$box_number.'%');
             })
             // Search by year(s) of judgment
-            ->when($request->year_of_judgment, function ($query, $years) {
-                $yearsArray = is_array($years) ? $years : [$years];
-                return $query->whereIn('year_of_judgment', $yearsArray);
+            ->when($request->has('year_of_judgment'), function ($query) use ($request) {
+                $years = (array)$request->year_of_judgment;
+                // Remove empty values and the "all years" empty value
+                $years = array_filter($years, function($value) {
+                    return $value !== '' && $value !== '[]';
+                });
+                
+                if (!empty($years)) {
+                    return $query->whereIn('year_of_judgment', $years);
+                }
+                // If empty array after filtering, don't apply any year filter
+                return $query;
             })
             // Search by file type
             ->when($request->file_type, function ($query, $file_type) {
@@ -352,4 +362,56 @@ class BoxController extends Controller
     {
         return Excel::download(new BoxesExport($request->all()), 'boxes_export.xlsx');
     }
+
+    
+
+    public function importExcel(Request $request)
+    {
+        $request->validate([
+            'excels.*' => 'required|mimes:xlsx,xls',
+            'tribunal_id' => 'required|exists:tribunaux,id',
+            'saving_base_id' => 'required|exists:saving_bases,id',
+            'file_type' => 'required|string',
+            'type' => 'required|string',
+            'year_of_judgment' => 'nullable|date_format:Y',
+        ]);
+        
+        $importedBoxes = [];
+        
+        foreach ($request->file('excels') as $excel) {
+            $import = new BoxImport(
+                $request->tribunal_id,
+                $request->saving_base_id,
+                $request->file_type,
+                $request->type,
+                $request->year_of_judgment
+            );
+            
+            Excel::import($import, $excel);
+            
+            // Update total files count
+            $box = $import->getBox();
+            if ($box) {
+                $box->update([
+                    'total_files' => $box->files()->count()
+                ]);
+                $importedBoxes[] = $box->box_number;
+            }
+        }
+        
+        return redirect()->route('boxes.index')
+            ->with('success', count($importedBoxes) > 0 
+                ? "تم استيراد الصناديق أرقام: " . implode(', ', $importedBoxes)
+                : "لم يتم استيراد أي صناديق");
+    }
+
+    public function showImportForm()
+    {
+        $tribunals = Tribunal::all(); // Assuming you have a Tribunal model
+        $savingBases = SavingBase::all(); // Assuming you have a SavingBase model
+        
+        return view('boxes.import', compact('tribunals', 'savingBases'));
+    }
+
+
 }

@@ -94,6 +94,11 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
 
     Route::get('/latest-activities', [AdminDashboardController::class, 'latestActivities'])->name('admin.latestActivities');
 
+
+
+    Route::get('/boxes/import', [BoxController::class, 'showImportForm'])->name('admin.boxes.import.form');
+    Route::post('/boxes/import', [BoxController::class, 'importExcel'])->name('admin.boxes.import');
+
 });
 
 // Controller routes
