@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Exports\BoxFilesExport;
 use App\Imports\BoxImport;
+use App\Models\User;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Mpdf\Mpdf;
@@ -413,5 +414,45 @@ class BoxController extends Controller
         return view('boxes.import', compact('tribunals', 'savingBases'));
     }
 
+
+    public function assignUserForm()
+    {
+        // Get all boxes created by admins
+        $boxes = Box::whereHas('user', function($query) {
+            $query->role('admin');
+        })
+        ->with(['user:id,name'])
+        ->withCount('files')
+        ->get();
+
+        // Get all regular users (non-admins)
+        $users = User::whereDoesntHave('roles', function($query) {
+            $query->whereIn('name', ['admin', 'controller']);
+        })->get();
+
+        return view('boxes.assign', compact('boxes', 'users'));
+    }
+
+    public function assignUser(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'boxes' => 'required|array',
+            'boxes.*' => 'exists:boxes,id'
+        ]);
+
+        // Verify selected user is not an admin
+        $user = User::findOrFail($request->user_id);
+        if ($user->hasRole('admin')) {
+            return back()->with('error', 'لا يمكن تعيين الصناديق لمدير النظام');
+        }
+
+        // Assign boxes to user
+        Box::whereIn('id', $request->boxes)
+            ->update(['user_id' => $request->user_id]);
+
+        return redirect()->route('boxes.assign-form')
+            ->with('success', 'تم تعيين الصناديق للمستخدم بنجاح');
+    }
 
 }

@@ -98,6 +98,11 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
 
     Route::get('/boxes/import', [BoxController::class, 'showImportForm'])->name('admin.boxes.import.form');
     Route::post('/boxes/import', [BoxController::class, 'importExcel'])->name('admin.boxes.import');
+    
+    Route::get('/boxes/assign', [BoxController::class, 'assignUserForm'])
+        ->name('boxes.assign-form');
+    Route::post('/boxes/assign', [BoxController::class, 'assignUser'])
+        ->name('boxes.assign-user');
 
 });
 
