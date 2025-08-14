@@ -60,14 +60,14 @@ class AdminDashboardController extends Controller
             ->having('boxes_count', '>', 0)
             ->orderBy('boxes_count', 'desc')
             ->with('boxes') // Eager load boxes for additional stats
-            ->paginate(5, ['*'], 'top_page'),
+            ->paginate(8, ['*'], 'top_page'),
             
             'slow_performers' => User::withCount(['boxes' => function($query) {
                 $query->whereNotNull('validated_at');
             }])
             ->having('boxes_count', '>', 0)
             ->orderBy('boxes_count', 'asc')
-            ->paginate(5, ['*'], 'slow_page'),
+            ->paginate(8, ['*'], 'slow_page'),
             
             'avg_validation_time' => $this->calculateAvgValidationTime()
         ];
