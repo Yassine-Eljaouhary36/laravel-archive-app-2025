@@ -69,5 +69,6 @@ class Kernel extends HttpKernel
         'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
         'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         'redirect.dashboard' => \App\Http\Middleware\RedirectToDashboard::class,
+        'admin_or_specific_controller' => \App\Http\Middleware\CheckAdminOrSpecificController::class,
     ];
 }

@@ -456,4 +456,16 @@ class BoxController extends Controller
             ->with('success', 'تم تعيين الصناديق للمستخدم بنجاح');
     }
 
+
+    // In your BoxController
+    public function destroy($id)
+    {
+        $box = Box::findOrFail($id);
+        $boxNumber = $box->box_number; // Assuming you have a 'box_number' field
+        
+        $box->delete(); // This will automatically delete all related files
+        
+        return redirect()->route('boxes.index')
+            ->with('success', 'تم حذف الصندوق رقم ' . $boxNumber . ' وجميع الملفات المرتبطة به بنجاح');
+    }
 }

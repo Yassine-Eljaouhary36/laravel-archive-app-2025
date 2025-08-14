@@ -41,7 +41,7 @@
                     <!-- Validation Warning -->
                     @if($box->isValidated())
                         <div class="mb-4 p-3 bg-yellow-300 text-black-800 rounded-lg">
-                            <i class="fas fa-lock mr-2"></i> هذا العلبة  تم التحقق منه ولا يمكن تعديله
+                            <i class="fas fa-lock mr-2"></i> هذا العلبة  تم التحقق منها ولا يمكن تعديلها
                         </div>
                         <button type="button" class="cursor-not-allowed" disabled>
                             <span class="mr-5">تم التحقق بواسطة :</span>

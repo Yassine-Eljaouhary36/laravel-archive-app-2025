@@ -240,12 +240,12 @@
         
         // Scroll to Bottom
         function scrollToBottom() {
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'auto' });
         }
 
         // Scroll to Top
         function scrollToTop() {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            window.scrollTo({ top: 0, behavior: 'auto' });
         }
 
         const scrollDownBtn = document.getElementById('quickScrollDownBtn');

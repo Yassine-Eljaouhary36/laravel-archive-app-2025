@@ -19,7 +19,7 @@
                                 value="{{ request('box_number') }}"
                                 class="mt-1 block w-full"/>
                         </div>
-                        
+                        <a href="{{route('admin.boxes.import.form')}}">test</a>
                         <!-- Year of Judgment - Multi-select -->
                         <div>
                             <x-input-label for="year_of_judgment" :value="__('سنة الحكم')" />

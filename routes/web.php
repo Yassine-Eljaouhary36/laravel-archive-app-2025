@@ -94,8 +94,11 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
 
     Route::get('/latest-activities', [AdminDashboardController::class, 'latestActivities'])->name('admin.latestActivities');
 
+    Route::get('/boxes/destroy/{box}', [BoxController::class, 'destroy'])
+    ->name('boxes.destroy');
+});
 
-
+Route::prefix('management')->middleware(['auth','admin_or_specific_controller'])->group(function () {
     Route::get('/boxes/import', [BoxController::class, 'showImportForm'])->name('admin.boxes.import.form');
     Route::post('/boxes/import', [BoxController::class, 'importExcel'])->name('admin.boxes.import');
     
@@ -103,7 +106,6 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
         ->name('boxes.assign-form');
     Route::post('/boxes/assign', [BoxController::class, 'assignUser'])
         ->name('boxes.assign-user');
-
 });
 
 // Controller routes

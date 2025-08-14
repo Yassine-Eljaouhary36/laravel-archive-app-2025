@@ -29,7 +29,7 @@ class BoxImport implements ToModel, WithStartRow
     
     public function startRow(): int
     {
-        return 15; // Start reading from row 15
+        return 11; // Start reading from row 11
     }
 
     public function model(array $row)
