@@ -204,10 +204,9 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Prepare data for chart
-            const users = @json($users->items());
+            const users = @json($chartData);
             const labels = users.map(user => user.name);
             const filesData = users.map(user => user.valid_files_count);
-            const boxesData = users.map(user => user.boxes_validated_count);
 
             // Create chart
             const ctx = document.getElementById('performanceChart').getContext('2d');
@@ -223,13 +222,6 @@
                             borderColor: 'rgba(59, 130, 246, 1)',
                             borderWidth: 1
                         },
-                        {
-                            label: 'العلب المعالجة',
-                            data: boxesData,
-                            backgroundColor: 'rgba(139, 92, 246, 0.7)',
-                            borderColor: 'rgba(139, 92, 246, 1)',
-                            borderWidth: 1
-                        }
                     ]
                 },
                 options: {

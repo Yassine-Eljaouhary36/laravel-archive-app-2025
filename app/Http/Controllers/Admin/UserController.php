@@ -30,20 +30,18 @@ class UserController extends Controller
                     if ($request->filled(['date_from', 'date_to'])) {
                         $dateFrom = Carbon::parse($request->date_from)->startOfDay();
                         $dateTo = Carbon::parse($request->date_to)->endOfDay();
-                        
                         $q->whereBetween('validated_at', [$dateFrom, $dateTo]);
                     }
                 }
             ])
             ->with(['boxes' => function($q) use ($request) {
-                $q->whereNotNull('validated_at');
-                if ($request->filled(['date_from', 'date_to'])) {
+                $q->whereNotNull('validated_at')
+                ->when($request->filled(['date_from', 'date_to']), function($q) use ($request) {
                     $dateFrom = Carbon::parse($request->date_from)->startOfDay();
                     $dateTo = Carbon::parse($request->date_to)->endOfDay();
-                    
                     $q->whereBetween('validated_at', [$dateFrom, $dateTo]);
-                }
-                $q->withCount('files');
+                })
+                ->withCount('files');
             }]);
         
         // Apply role filter if provided
@@ -52,24 +50,41 @@ class UserController extends Controller
                 $q->where('name', $request->role);
             });
         }
-        
-        // Get and process results
-        $users = $query->get()
-            ->each(function($user) {
-                $user->valid_files_count = $user->boxes->sum('files_count');
+
+        // Transform collection to array with required properties
+        // $query->get()->getCollection()
+        // Get chart data (exclude controllers)
+        $chartData = $query->clone()
+            ->whereDoesntHave('roles', function($q) {
+                $q->where('name', 'controller');
             })
-            ->sortByDesc('valid_files_count');
-        
+            ->get()
+            ->map(function($user) {
+                return (object) [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'boxes_validated_count' => $user->boxes_validated_count,
+                    'valid_files_count' => $user->boxes->sum('files_count'),
+                    'role' => $user->roles->first()->name ?? null
+                ];
+            })
+            ->sortByDesc('valid_files_count')
+            ->values();
+
+        // Get paginated results
+        $users = $query->paginate(10);
 
         // Get performance metrics data
         $metrics = [
             'total_users' => User::whereDoesntHave('roles', fn($q) => $q->where('name', 'admin'))->count(),
             'active_users' => User::where('is_active', true)->whereDoesntHave('roles', fn($q) => $q->where('name', 'admin'))->count(),
-            'total_validated_boxes' => Box::whereNotNull('validated_at')->when($request->filled(['date_from', 'date_to']), function($q) use ($request) {
-                $dateFrom = Carbon::parse($request->date_from)->startOfDay();
-                $dateTo = Carbon::parse($request->date_to)->endOfDay();
-                $q->whereBetween('validated_at', [$dateFrom, $dateTo]);
-            })->count(),
+            'total_validated_boxes' => Box::whereNotNull('validated_at')
+                ->when($request->filled(['date_from', 'date_to']), function($q) use ($request) {
+                    $dateFrom = Carbon::parse($request->date_from)->startOfDay();
+                    $dateTo = Carbon::parse($request->date_to)->endOfDay();
+                    $q->whereBetween('validated_at', [$dateFrom, $dateTo]);
+                })->count(),
             'total_validated_files' => Box::whereNotNull('validated_at')
                 ->when($request->filled(['date_from', 'date_to']), function($q) use ($request) {
                     $dateFrom = Carbon::parse($request->date_from)->startOfDay();
@@ -80,19 +95,13 @@ class UserController extends Controller
                 ->get()
                 ->sum('files_count'),
         ];
-            
-        // Paginate results
-        $page = request('page', 1);
-        $perPage = 10;
-        $users = new LengthAwarePaginator(
-            $users->forPage($page, $perPage),
-            $users->count(),
-            $perPage,
-            $page,
-            ['path' => request()->url(), 'query' => request()->query()]
-        );
         
-        return view('admin.users.index', compact('users', 'roles', 'metrics'));
+        return view('admin.users.index', [
+            'users' => $users,
+            'roles' => $roles,
+            'metrics' => $metrics,
+            'chartData' => $chartData
+        ]);
     }
 
     public function create()

@@ -63,10 +63,10 @@ class AdminDashboardController extends Controller
             ->paginate(5, ['*'], 'top_page'),
             
             'slow_performers' => User::withCount(['boxes' => function($query) {
-                $query->whereNull('validated_at');
+                $query->whereNotNull('validated_at');
             }])
             ->having('boxes_count', '>', 0)
-            ->orderBy('boxes_count', 'desc')
+            ->orderBy('boxes_count', 'asc')
             ->paginate(5, ['*'], 'slow_page'),
             
             'avg_validation_time' => $this->calculateAvgValidationTime()

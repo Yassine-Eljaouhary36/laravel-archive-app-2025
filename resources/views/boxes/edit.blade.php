@@ -10,15 +10,32 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
                     @if ($errors->any())
-    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-        <ul class="list-disc list-inside">
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
+                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                            <ul class="list-disc list-inside">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
 
+                    <!-- Scroll to Bottom Button -->
+                    <button 
+                        id="quickScrollDownBtn" 
+                        class="fixed bottom-4 right-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition-opacity duration-300"
+                        onclick="scrollToBottom()"
+                    >
+                        ↓
+                    </button>
+
+                    <!-- Scroll to Top Button -->
+                    <button 
+                        id="quickScrollTopBtn" 
+                        class="fixed bottom-20 right-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition-opacity duration-300 opacity-0"
+                        onclick="scrollToTop()"
+                    >
+                        ↑
+                    </button>
                     <form id="boxForm" action="{{ route('boxes.update', $box->id) }}" method="POST">
                         @csrf
                         @method('PUT')
@@ -173,6 +190,7 @@
                                 <table class="min-w-full divide-y divide-gray-200">
                                     <thead class="bg-gray-50">
                                         <tr>
+                                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
                                             <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('رقم الملف') }}</th>
                                             <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('رمز الملف') }}</th>
                                             <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('سنة فتح الملف') }}</th>
@@ -185,6 +203,7 @@
                                     <tbody id="filesTableBody" class="bg-white divide-y divide-gray-200">
                                         @foreach($box->files as $file)
                                         <tr>
+                                            <td class="px-6 py-4 whitespace-nowrap">{{ $loop->index + 1 }}</td>
                                             <td class="px-6 py-4 whitespace-nowrap">{{ $file->file_number }}</td>
                                             <td class="px-6 py-4 whitespace-nowrap">{{ $file->symbol }}</td>
                                             <td class="px-6 py-4 whitespace-nowrap">{{ $file->year_of_opening }}</td>
@@ -218,6 +237,35 @@
 
     @push('scripts')
     <script>
+        
+        // Scroll to Bottom
+        function scrollToBottom() {
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        // Scroll to Top
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        const scrollDownBtn = document.getElementById('quickScrollDownBtn');
+        const scrollTopBtn = document.getElementById('quickScrollTopBtn');
+
+        window.addEventListener('scroll', () => {
+            const scrollY = window.scrollY;
+            const isAtBottom = window.innerHeight + scrollY >= document.body.offsetHeight - 50;
+            const isAtTop = scrollY < 100; // Adjust threshold as needed
+
+            // Toggle Bottom Button
+            scrollDownBtn.style.opacity = isAtBottom ? '0' : '1';
+            scrollDownBtn.style.pointerEvents = isAtBottom ? 'none' : 'auto';
+
+            // Toggle Top Button (only shows when scrolled down)
+            scrollTopBtn.style.opacity = isAtTop ? '0' : '1';
+            scrollTopBtn.style.pointerEvents = isAtTop ? 'none' : 'auto';
+        });
+
+
         let files = {!! json_encode($box->files->map(function($file) {
             return [
                 'file_number' => $file->file_number,
@@ -385,12 +433,16 @@
             document.getElementById('judgment_date').value = file.judgment_date;
             document.getElementById('remark').value = file.remark || '';
 
-            document.getElementById('fileFormContainer').classList.remove('hidden');
+            // Show the form container
+            const formContainer = document.getElementById('fileFormContainer');
+            formContainer.classList.remove('hidden');
             document.getElementById('fileFormTitle').textContent = 'تعديل الملف';
             document.getElementById('insertFileFataButton').textContent = 'تعديل الملف ';
             document.getElementById('fileFormContainer').style.backgroundColor = 'rgb(255 223 118 / 43%)';
 
             editingIndex = index;
+            // Scroll to the form container
+            formContainer.scrollIntoView({ behavior: 'smooth' });
         }
 
         function removeFile(index) {
@@ -435,6 +487,7 @@
             files.forEach((file, index) => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${index + 1}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${file.file_number}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${file.symbol}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${file.year_of_opening}</td>
