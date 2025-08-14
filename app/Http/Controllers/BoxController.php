@@ -214,6 +214,7 @@ class BoxController extends Controller
                 'year_of_judgment' => $validated['year_of_judgment'],
                 'tribunal_id' => $validated['tribunal_id'],
                 'box_number' => $box->box_number, // Keep updated value
+                'total_files' => count($validated['files']),
             ]);
 
             // Handle files
