@@ -19,7 +19,6 @@
                                 value="{{ request('box_number') }}"
                                 class="mt-1 block w-full"/>
                         </div>
-                        <a href="{{route('admin.boxes.import.form')}}">test</a>
                         <!-- Year of Judgment - Multi-select -->
                         <div>
                             <x-input-label for="year_of_judgment" :value="__('سنة الحكم')" />
@@ -109,6 +108,42 @@
                             <x-heroicon-o-plus class="ml-2 mr-2 h-5 w-5 inline"/>
                         </a>
                     @endif
+                    <!-- Management Dropdown Menu -->
+                    @auth
+                        @if(auth()->user()->canAccessManagementRoutes())
+                            <div class="relative ml-3">
+                                <x-dropdown align="right" width="48">
+                                    <x-slot name="trigger">
+                                        <button class="inline-flex items-center px-3 py-2 text-sm font-medium bg-purple-500 text-white rounded-lg hover:bg-purple-600  focus:outline-none transition">
+                                            <span>{{ __('إدارة الصناديق') }}</span>
+                                            <svg class="ml-2 -mr-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    </x-slot>
+
+                                    <x-slot name="content">
+                                        <!-- Import Boxes -->
+                                        <x-dropdown-link 
+                                            :href="route('admin.boxes.import.form')" 
+                                            :active="request()->routeIs('admin.boxes.import.form')">
+                                            <x-heroicon-s-arrow-up-tray class="ml-2 h-5 w-5 inline" />
+                                            {{ __('استيراد الصناديق') }}
+                                        </x-dropdown-link>
+
+                                        <!-- Assign Boxes -->
+                                        <x-dropdown-link 
+                                            :href="route('boxes.assign-form')" 
+                                            :active="request()->routeIs('boxes.assign-form')">
+                                            <x-heroicon-s-user-plus class="ml-2 h-5 w-5 inline" />
+                                            {{ __('تعيين الصناديق') }}
+                                        </x-dropdown-link>
+                                    </x-slot>
+                                </x-dropdown>
+                            </div>
+                        @endif
+                    @endauth
+
                     @if (auth()->user()->hasAnyRole(['admin']))
                         <a href="{{ route('boxes.exportBoxes', request()->query()) }}" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
                             تصدير إلى Excel

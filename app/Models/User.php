@@ -55,4 +55,17 @@ class User extends Authenticatable
     {
         return $this->hasMany(Box::class);
     }
+
+    // In User model
+    public function canAccessManagementRoutes()
+    {
+        return $this->hasRole('admin') || 
+            ($this->hasRole('controller') && $this->isAllowedController());
+    }
+
+    protected function isAllowedController()
+    {
+        // Your logic to identify specific controllers
+        return in_array($this->id, [20]); // Example by user IDs
+    }
 }
