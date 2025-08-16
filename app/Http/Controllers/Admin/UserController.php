@@ -34,6 +34,18 @@ class UserController extends Controller
                     }
                 }
             ])
+            // Add subquery to sum total_files from validated boxes
+            ->selectSub(function($q) use ($request) {
+                $q->selectRaw('COALESCE(SUM(total_files), 0)')
+                    ->from('boxes')
+                    ->whereColumn('user_id', 'users.id')
+                    ->whereNotNull('validated_at')
+                    ->when($request->filled(['date_from', 'date_to']), function($q) use ($request) {
+                        $dateFrom = Carbon::parse($request->date_from)->startOfDay();
+                        $dateTo = Carbon::parse($request->date_to)->endOfDay();
+                        $q->whereBetween('validated_at', [$dateFrom, $dateTo]);
+                    });
+            }, 'valid_files_count')
             ->with(['boxes' => function($q) use ($request) {
                 $q->whereNotNull('validated_at')
                 ->when($request->filled(['date_from', 'date_to']), function($q) use ($request) {
@@ -42,8 +54,10 @@ class UserController extends Controller
                     $q->whereBetween('validated_at', [$dateFrom, $dateTo]);
                 })
                 ->withCount('files');
-            }]);
-        
+            }])
+            // Sort by files count at database level
+            ->orderByDesc('valid_files_count');
+
         // Apply role filter if provided
         if ($request->filled('role')) {
             $query->whereHas('roles', function($q) use ($request) {

@@ -8,6 +8,28 @@
             <!-- Page Content -->
     <main>
         <div class="py-12">
+            <div id="customToast" class="custom-toast" dir="rtl">
+                <span id="customToastMessage"></span>
+                <span class="custom-toast-icon">✓</span>
+            </div>
+
+                <!-- Scroll to Bottom Button -->
+                <button 
+                    id="quickScrollDownBtn" 
+                    class="fixed bottom-4 right-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition-opacity duration-300"
+                    onclick="scrollToBottom()"
+                >
+                    ↓
+                </button>
+                <!-- Scroll to Top Button -->
+                <button 
+                    id="quickScrollTopBtn" 
+                    class="fixed bottom-20 right-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition-opacity duration-300 opacity-0"
+                    onclick="scrollToTop()"
+                >
+                    ↑
+                </button>
+
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 bg-white border-b border-gray-200">
@@ -160,6 +182,7 @@
                                     <table class="min-w-full divide-y divide-gray-200">
                                         <thead class="bg-gray-50">
                                             <tr>
+                                                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
                                                 <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('رقم الملف') }}</th>
                                                 <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('رمز الملف') }}</th>
                                                 <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('سنة فتح الملف') }}</th>
@@ -229,7 +252,7 @@
             function resetFileForm() {
                 document.getElementById('file_number').value = '';
                 document.getElementById('symbol').value = '';
-                document.getElementById('year_of_opening').value = '';
+                // document.getElementById('year_of_opening').value = '';
                 document.getElementById('judgment_number').value = '';
                 document.getElementById('judgment_date').value = '';
                 document.getElementById('remark').value = ''; // Add this line
@@ -342,13 +365,8 @@
                     files.push(fileData);
                     
                     // Show success message for adding
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'تم الإضافة بنجاح',
-                        text: 'تم إضافة الملف الجديد بنجاح',
-                        showConfirmButton: false,
-                        timer: 600
-                    });
+                    // In your saveFile function, replace the addition success with:
+                    showCustomToast('تم إضافة الملف الجديد بنجاح', 1000);
                 }
                 document.getElementById('file_number').focus();
 
@@ -416,6 +434,7 @@
                 files.forEach((file, index) => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${index + 1}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${file.file_number}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${file.symbol}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${file.year_of_opening}</td>
@@ -565,7 +584,97 @@
                     }
                 });
             });
+
+
+            // Custom toast notification function
+            function showCustomToast(message, duration = 1000) {
+                const toast = document.getElementById('customToast');
+                const toastMessage = document.getElementById('customToastMessage');
+                
+                // Set message and show toast
+                toastMessage.textContent = message;
+                toast.style.display = 'flex'; // Make visible
+                setTimeout(() => toast.classList.add('show'), 10); // Small delay for transition
+                
+                // Hide after duration
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    // Wait for transition to complete before hiding
+                    setTimeout(() => toast.style.display = 'none', 300);
+                }, duration);
+            }
+
+            // Scroll to Bottom
+            function scrollToBottom() {
+                window.scrollTo({ top: document.body.scrollHeight, behavior: 'auto' });
+            }
+
+            // Scroll to Top
+            function scrollToTop() {
+                window.scrollTo({ top: 0, behavior: 'auto' });
+            }
+
+            const scrollDownBtn = document.getElementById('quickScrollDownBtn');
+            const scrollTopBtn = document.getElementById('quickScrollTopBtn');
+
+            window.addEventListener('scroll', () => {
+                const scrollY = window.scrollY;
+                const isAtBottom = window.innerHeight + scrollY >= document.body.offsetHeight - 50;
+                const isAtTop = scrollY < 100; // Adjust threshold as needed
+
+                // Toggle Bottom Button
+                scrollDownBtn.style.opacity = isAtBottom ? '0' : '1';
+                scrollDownBtn.style.pointerEvents = isAtBottom ? 'none' : 'auto';
+
+                // Toggle Top Button (only shows when scrolled down)
+                scrollTopBtn.style.opacity = isAtTop ? '0' : '1';
+                scrollTopBtn.style.pointerEvents = isAtTop ? 'none' : 'auto';
+            });
         </script>
 
+    @endpush
+
+    @push('styles')
+        <style>
+            /* Custom Toast Notification - Bottom Position */
+            .custom-toast {
+                position: fixed;
+                bottom: 20px;
+                left: 20px;
+                background-color: #48bb78; /* Green color for success */
+                color: white;
+                padding: 15px 25px;
+                border-radius: 4px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                z-index: 9999;
+                opacity: 0;
+                transform: translateY(20px);
+                transition: opacity 0.3s, transform 0.3s;
+                display: none; /* Start hidden */
+                align-items: center;
+            }
+
+            .custom-toast.show {
+                display: flex;
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            .custom-toast-icon {
+                margin-left: 10px;
+                font-size: 20px;
+            }
+
+            /* RTL support for Arabic */
+            [dir="rtl"] .custom-toast {
+                right: auto;
+                left: 20px;
+            }
+
+            [dir="rtl"] .custom-toast-icon {
+                margin-left: 0;
+                margin-right: 10px;
+            }
+        </style>
     @endpush
 </x-app-layout>
