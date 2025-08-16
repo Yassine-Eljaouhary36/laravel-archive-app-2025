@@ -33,7 +33,6 @@
                             <select name="tribunal_id" id="tribunal_id" 
                                     class="cursor-not-allowed  mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                                     required
-                                    disabled
                                     readonly
                                     tabindex="-1"
                                     aria-readonly="true">
@@ -49,7 +48,6 @@
                             <select name="saving_base_id" id="saving_base_id" 
                                     class="cursor-not-allowed mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                                     required
-                                        disabled
                                         readonly
                                         tabindex="-1"
                                         aria-readonly="true">
@@ -66,7 +64,6 @@
                                    class="cursor-not-allowed mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                    required  value="الرئاسة"    
                                         readonly
-                                        disabled
                                         tabindex="-1"
                                         aria-readonly="true">
                         </div>
@@ -80,7 +77,6 @@
                                    class="cursor-not-allowed mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                    required value="ملفات التنفيذ على شركات التأمين" 
                                         readonly
-                                        disabled
                                         tabindex="-1"
                                         aria-readonly="true">
                         </div>

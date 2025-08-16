@@ -375,7 +375,6 @@ class BoxController extends Controller
             'saving_base_id' => 'required|exists:saving_bases,id',
             'file_type' => 'required|string',
             'type' => 'required|string',
-            'year_of_judgment' => 'nullable|date_format:Y',
         ]);
         
         $importedBoxes = [];
@@ -386,7 +385,6 @@ class BoxController extends Controller
                 $request->saving_base_id,
                 $request->file_type,
                 $request->type,
-                $request->year_of_judgment
             );
             
             Excel::import($import, $excel);
