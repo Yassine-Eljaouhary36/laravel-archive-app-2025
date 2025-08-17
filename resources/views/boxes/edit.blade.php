@@ -6,6 +6,10 @@
     </x-slot>
 
     <div class="py-12">
+        <div id="customToast" class="custom-toast" dir="rtl">
+            <span id="customToastMessage"></span>
+            <span class="custom-toast-icon">✓</span>
+        </div>
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
@@ -297,7 +301,7 @@
         function resetFileForm() {
             document.getElementById('file_number').value = '';
             document.getElementById('symbol').value = '';
-            document.getElementById('year_of_opening').value = '';
+            // document.getElementById('year_of_opening').value = '';
             document.getElementById('judgment_number').value = '';
             document.getElementById('judgment_date').value = '';
             document.getElementById('remark').value = '';
@@ -410,15 +414,10 @@
                 // Add new file
                 files.push(fileData);
                 // Show success message for adding
-                Swal.fire({
-                    icon: 'success',
-                    title: 'تم الإضافة بنجاح',
-                    text: 'تم إضافة الملف الجديد بنجاح',
-                    showConfirmButton: false,
-                    timer: 600
-                });
+                // In your saveFile function, replace the addition success with:
+                showCustomToast('تم إضافة الملف الجديد بنجاح', 1000);
             }
-
+            document.getElementById('file_number').focus();
             updateFilesTable();
             resetFileForm();
             updateHiddenInputs();
@@ -622,6 +621,67 @@
                 }
             });
         });
+
+        // Custom toast notification function
+        function showCustomToast(message, duration = 1000) {
+            const toast = document.getElementById('customToast');
+            const toastMessage = document.getElementById('customToastMessage');
+                
+            // Set message and show toast
+            toastMessage.textContent = message;
+            toast.style.display = 'flex'; // Make visible
+            setTimeout(() => toast.classList.add('show'), 10); // Small delay for transition
+                
+            // Hide after duration
+            setTimeout(() => {
+                toast.classList.remove('show');
+                // Wait for transition to complete before hiding
+                setTimeout(() => toast.style.display = 'none', 300);
+            }, duration);
+        }
     </script>
+    @endpush
+    @push('styles')
+        <style>
+            /* Custom Toast Notification - Bottom Position */
+            .custom-toast {
+                position: fixed;
+                bottom: 20px;
+                left: 20px;
+                background-color: #48bb78; /* Green color for success */
+                color: white;
+                padding: 15px 25px;
+                border-radius: 4px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                z-index: 9999;
+                opacity: 0;
+                transform: translateY(20px);
+                transition: opacity 0.3s, transform 0.3s;
+                display: none; /* Start hidden */
+                align-items: center;
+            }
+
+            .custom-toast.show {
+                display: flex;
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            .custom-toast-icon {
+                margin-left: 10px;
+                font-size: 20px;
+            }
+
+            /* RTL support for Arabic */
+            [dir="rtl"] .custom-toast {
+                right: auto;
+                left: 20px;
+            }
+
+            [dir="rtl"] .custom-toast-icon {
+                margin-left: 0;
+                margin-right: 10px;
+            }
+        </style>
     @endpush
 </x-app-layout>

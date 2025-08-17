@@ -418,7 +418,7 @@ class BoxController extends Controller
     {
         // Get all boxes created by admins
         $boxes = Box::whereHas('user', function($query) {
-            $query->role('admin');
+            $query->role(['admin', 'controller']); // Spatie's role() scope
         })
         ->with(['user:id,name'])
         ->withCount('files')
