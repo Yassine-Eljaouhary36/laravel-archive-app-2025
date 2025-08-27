@@ -66,6 +66,6 @@ class User extends Authenticatable
     protected function isAllowedController()
     {
         // Your logic to identify specific controllers
-        return in_array($this->id, [20]); // Example by user IDs
+        return in_array($this->id, [38]); // Example by user IDs
     }
 }

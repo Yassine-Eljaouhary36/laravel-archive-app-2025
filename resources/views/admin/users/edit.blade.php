@@ -34,6 +34,24 @@
                                 <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email', $user->email)" required />
                                 <x-input-error :messages="$errors->get('email')" class="mt-2" />
                             </div>
+                            <!-- Password -->
+                            <div>
+                                <x-input-label for="password" :value="__('كلمة المرور')" />
+                                <x-text-input id="password" class="block mt-1 w-full"
+                                                type="password"
+                                                name="password"
+                                                required autocomplete="new-password" />
+                                <x-input-error :messages="$errors->get('password')" class="mt-2" />
+                            </div>
+
+                            <!-- Confirm Password -->
+                            <div>
+                                <x-input-label for="password_confirmation" :value="__('تأكيد كلمة المرور')" />
+                                <x-text-input id="password_confirmation" class="block mt-1 w-full"
+                                                type="password"
+                                                name="password_confirmation" required />
+                                <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+                            </div>
 
                             <!-- Role -->
                             <div class="md:col-span-2">

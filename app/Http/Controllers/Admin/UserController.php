@@ -304,12 +304,14 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,'.$user->id,
+            'password' => 'required|string|min:8|confirmed',
             'role' => 'required|exists:roles,name',
         ]);
 
         $user->update([
             'name' => $request->name,
             'email' => $request->email,
+            'password' => Hash::make($request->password),
         ]);
 
         $user->syncRoles($request->role);

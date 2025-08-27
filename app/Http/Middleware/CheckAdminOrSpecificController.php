@@ -35,7 +35,7 @@ class CheckAdminOrSpecificController
     {
         // Implement your logic to identify specific controllers
         // For example, check user ID, email, or other attributes:
-        return in_array($user->id, [20]); // IDs of allowed controllers
+        return in_array($user->id, [38]); // IDs of allowed controllers
         // OR:
         // return $user->hasPermission('import_boxes'); // If you have permissions
     }

@@ -639,6 +639,14 @@
                 setTimeout(() => toast.style.display = 'none', 300);
             }, duration);
         }
+
+        document.getElementById('fileFormContainer').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('insertFileFataButton').click();
+                return;
+            }
+        });
     </script>
     @endpush
     @push('styles')

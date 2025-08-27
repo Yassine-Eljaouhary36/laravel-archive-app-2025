@@ -630,6 +630,14 @@
                 scrollTopBtn.style.opacity = isAtTop ? '0' : '1';
                 scrollTopBtn.style.pointerEvents = isAtTop ? 'none' : 'auto';
             });
+
+            document.getElementById('fileFormContainer').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    document.getElementById('insertFileFataButton').click();
+                    return;
+                }
+            });
         </script>
 
     @endpush

@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use App\Exports\BoxFilesExport;
 use App\Imports\BoxImport;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Mpdf\Mpdf;
@@ -455,15 +456,32 @@ class BoxController extends Controller
     }
 
 
-    // In your BoxController
-    public function destroy($id)
-    {
-        $box = Box::findOrFail($id);
-        $boxNumber = $box->box_number; // Assuming you have a 'box_number' field
-        
-        $box->delete(); // This will automatically delete all related files
-        
-        return redirect()->route('boxes.index')
-            ->with('success', 'تم حذف الصندوق رقم ' . $boxNumber . ' وجميع الملفات المرتبطة به بنجاح');
+    public function formdestroy(){
+        $boxes = Box::all();
+
+        return view('boxes.delete', compact('boxes'));
     }
+
+    public function destroyMany(Request $request)
+    {
+        $request->validate([
+            'boxes' => 'required|array',
+            'password' => 'required|string',
+        ]);
+
+        if (!Hash::check($request->password, auth()->user()->password)) {
+            return back()->withErrors(['password' => 'كلمة المرور غير صحيحة']);
+        }
+
+        $boxes = Box::whereIn('id', $request->boxes)->get();
+        $deleted = $boxes->pluck('box_number')->toArray();
+
+        foreach ($boxes as $box) {
+            $box->delete();
+        }
+
+        return redirect()->route('boxes.index')
+            ->with('success', 'تم حذف الصناديق: ' . implode(', ', $deleted));
+    }
+
 }

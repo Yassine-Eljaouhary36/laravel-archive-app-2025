@@ -217,7 +217,7 @@ class BoxFilesExport implements FromCollection, WithHeadings, WithStyles, WithDr
                     ->setFillType(Fill::FILL_SOLID)
                     ->getStartColor()
                     ->setRGB($fillColor);
-                $sheet->getRowDimension($row)->setRowHeight(50);
+                $sheet->getRowDimension($row)->setRowHeight(25);
             }
         }
     }

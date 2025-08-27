@@ -94,8 +94,11 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
 
     Route::get('/latest-activities', [AdminDashboardController::class, 'latestActivities'])->name('admin.latestActivities');
 
-    Route::get('/boxes/destroy/{box}', [BoxController::class, 'destroy'])
+    Route::get('/boxes/destroy', [BoxController::class, 'formdestroy'])
     ->name('boxes.destroy');
+    Route::delete('/boxes/destroy', [BoxController::class, 'destroyMany'])
+    ->name('boxes.destroyMany');
+
 });
 
 Route::prefix('management')->middleware(['auth','admin_or_specific_controller'])->group(function () {
