@@ -105,38 +105,90 @@
 
             <!-- Statistics by Type -->
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-8">
-                <div class="p-6 bg-white border-b border-gray-200">
-                    <h3 class="text-lg font-medium mb-4">{{ __('الإحصائيات حسب النوع') }}</h3>
+                <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold text-gray-800 section-title">الإحصائيات حسب النوع والسنة</h2>
+                    </div>
                     
-                    <div class="overflow-x-auto">
-                        <table class="w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('النوع') }}</th>
-                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('عدد العلب') }}</th>
-                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('عدد الملفات') }}</th>
+                    <div class="overflow-x-auto max-h-96 overflow-y-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="text-right bg-gray-100">
+                                    <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">النوع / السنة</th>
+                                    <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">عدد العلب</th>
+                                    <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">عدد الملفات</th>
+                                    <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">النسبة</th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                @forelse($statsByType as $type => $stats)
-                                    <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $type }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ $stats['total_boxes'] }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ $stats['total_files'] }}</td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="3" class="px-6 py-4 text-center text-sm text-gray-500">
-                                            {{ __('لا توجد بيانات') }}
-                                        </td>
-                                    </tr>
-                                @endforelse
+                            <tbody class="divide-y divide-gray-200">
+                                @foreach($statsByType as $type => $typeData)
+                                <!-- Type Header Row -->
+                                <tr class="bg-blue-50">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-blue-800">
+                                        <i class="fas fa-folder-open ml-2"></i>{{ $type }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-blue-800 text-center">{{ $typeData['total_boxes'] }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-blue-800 text-center">{{ $typeData['total_files'] }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-bold">
+                                            {{ round(($typeData['total_files'] / $totalStats['total_files']) * 100, 1) }}%
+                                        </span>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Year Rows for this Type -->
+                                @foreach($typeData['by_year'] as $year => $yearData)
+                                <tr class="table-row">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 pl-8">
+                                        <i class="fas fa-calendar-alt ml-2 text-gray-400"></i>{{ $year }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ $yearData['boxes'] }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ $yearData['files'] }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                                        <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">
+                                            {{ round(($yearData['files'] / $typeData['total_files']) * 100, 1) }}%
+                                        </span>
+                                    </td>
+                                </tr>
+                                @endforeach
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
-
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-8">
+                <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold text-gray-800 section-title">أكبر و أصغر سنة حكم حسب النوع</h2>
+                    </div>
+                    
+                    <div class="overflow-x-auto max-h-96 overflow-y-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="text-right bg-gray-100">
+                                    <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">النوع</th>
+                                    <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">أصغر سنة حكم</th>
+                                    <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">أكبر سنة حكم</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                @foreach($statsByType as $type => $typeData)
+                                @if ($typeData['min_year'] && $typeData['max_year'])
+                                    <tr class="bg-blue-50">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-blue-800">
+                                            <i class="fas fa-folder-open ml-2"></i>{{ $type }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-blue-800 text-center">{{ $typeData['min_year'] }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-blue-800 text-center">{{ $typeData['max_year'] }}</td>
+                                    </tr>
+                                @endif
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
             <!-- Visualization Charts -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="bg-white p-6 rounded-lg shadow">

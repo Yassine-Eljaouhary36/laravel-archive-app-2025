@@ -40,13 +40,28 @@ class StatisticController extends Controller
             $query->where('year_of_judgment', $request->year_of_judgment);
         }
 
-        // Get grouped statistics
+        // Get grouped statistics by type and year
         $statsByType = $query->get()
             ->groupBy('type')
             ->map(function($boxes) {
+                $byYear = $boxes->groupBy(function($box) {
+                    return $box->year_of_judgment ?: 'غير محدد';
+                })->map(function($yearBoxes) {
+                    return [
+                        'boxes' => $yearBoxes->count(),
+                        'files' => $yearBoxes->sum('files_count')
+                    ];
+                });
+                
+                // Get min and max years (excluding 'غير محدد')
+                $years = $boxes->pluck('year_of_judgment')->filter()->sort();
+                
                 return [
                     'total_boxes' => $boxes->count(),
-                    'total_files' => $boxes->sum('files_count')
+                    'total_files' => $boxes->sum('files_count'),
+                    'by_year' => $byYear,
+                    'min_year' => $years->first(),
+                    'max_year' => $years->last()
                 ];
             });
 
@@ -92,13 +107,28 @@ class StatisticController extends Controller
             $query->where('year_of_judgment', $request->year_of_judgment);
         }
 
-        // Get the statistics data
+        // Get grouped statistics by type and year
         $statsByType = $query->get()
             ->groupBy('type')
             ->map(function($boxes) {
+                $byYear = $boxes->groupBy(function($box) {
+                    return $box->year_of_judgment ?: 'غير محدد';
+                })->map(function($yearBoxes) {
+                    return [
+                        'boxes' => $yearBoxes->count(),
+                        'files' => $yearBoxes->sum('files_count')
+                    ];
+                });
+                
+                // Get min and max years (excluding 'غير محدد')
+                $years = $boxes->pluck('year_of_judgment')->filter()->sort();
+                
                 return [
                     'total_boxes' => $boxes->count(),
-                    'total_files' => $boxes->sum('files_count')
+                    'total_files' => $boxes->sum('files_count'),
+                    'by_year' => $byYear,
+                    'min_year' => $years->first(),
+                    'max_year' => $years->last()
                 ];
             });
 

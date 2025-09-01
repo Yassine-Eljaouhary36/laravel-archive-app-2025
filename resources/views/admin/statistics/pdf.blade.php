@@ -34,38 +34,37 @@
         }
         
         .filters {
-            background-color: #f8fafc;
+            background-color: #c1dcfc;
             padding: 10px;
             border-radius: 8px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid #5a5a5a;
         }
         
         .filter-item {
             margin-bottom: 10px;
         }
         
-        .summary-cards {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
-            gap: 20px;
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
         }
-        
-        .card {
-            flex: 1;
-            background-color: #f8fafc;
+
+        .summary-cell {
+            width: 50%;
+            text-align: center;
+            background-color: #c1dcfc;
+            border: 1px solid #5a5a5a;
             border-radius: 8px;
             padding: 20px;
-            text-align: center;
-            border: 1px solid #e2e8f0;
         }
-        
+
         .card-title {
             font-weight: bold;
             margin-bottom: 10px;
             color: #4a5568;
         }
-        
+
         .card-value {
             font-size: 32px;
             font-weight: bold;
@@ -102,8 +101,8 @@
             border-bottom: 1px solid #e2e8f0;
         }
         
-        tr:nth-child(even) {
-            background-color: #f8fafc;
+        .custom-style {
+            background-color: #d5d5d5;
         }
         
         .percentage-bar {
@@ -153,46 +152,73 @@
         <div class="filter-item"><strong>{{ __('سنة الحكم:') }}</strong> {{ $filters['year'] }}</div>
     </div>
 
-    <div class="summary-cards">
-        <div class="card">
-            <div class="card-title">{{ __('عدد العلب المعالجة') }}</div>
-            <div class="card-value">{{ $totalStats['total_boxes'] }}</div>
-        </div>
-        <div class="card">
-            <div class="card-title">{{ __('عدد الملفات المعالجة') }}</div>
-            <div class="card-value">{{ $totalStats['total_files'] }}</div>
-        </div>
-    </div>
+    <table class="summary-table">
+        <tr>
+            <td class="summary-cell">
+                <div class="card-title">{{ __('عدد العلب المعالجة') }}</div>
+                <div class="card-value">{{ $totalStats['total_boxes'] }}</div>
+            </td>
+            <td class="summary-cell">
+                <div class="card-title">{{ __('عدد الملفات المعالجة') }}</div>
+                <div class="card-value">{{ $totalStats['total_files'] }}</div>
+            </td>
+        </tr>
+    </table>
+
 
     <h3 class="section-title">{{ __('التوزيع حسب النوع') }}</h3>
     <table>
         <thead>
             <tr>
-                <th>{{ __('النوع') }}</th>
+                <th>{{ __('النوع / السنة') }}</th>
                 <th>{{ __('عدد الملفات') }}</th>
                 <th>{{ __('النسبة') }}</th>
             </tr>
         </thead>
         <tbody>
-            @php
-                $totalBoxes = $totalStats['total_boxes'] > 0 ? $totalStats['total_boxes'] : 1;
-                $totalFiles = $totalStats['total_files'] > 0 ? $totalStats['total_files'] : 1;
-            @endphp
-            
-            @forelse($statsByType as $type => $stats)
-                @php
-                    $filePercentage = round(($stats['total_files'] / $totalFiles) * 100, 1);
-                @endphp
-                <tr>
+            @forelse($statsByType as $type => $typeData)
+                <tr class="custom-style">
                     <td>{{ $type }}</td>
-                    <td>{{ $stats['total_files'] }}</td>
+                    <td>{{ $typeData['total_files'] }}</td>
                     <td>
-                        {{ $filePercentage }}%
-                        <div class="percentage-bar">
-                            <div class="percentage-fill" style="width: {{ $filePercentage }}%"></div>
-                        </div>
+                        {{ round(($typeData['total_files'] / $totalStats['total_files']) * 100, 1) }}%
                     </td>
                 </tr>
+                @foreach($typeData['by_year'] as $year => $yearData)
+                    <tr>
+                        <td>{{ $year }}</td>
+                        <td>{{ $yearData['files'] }}</td>
+                        <td>
+                            {{ round(($yearData['files'] / $totalStats['total_files']) * 100, 1) }}%
+                        </td>
+                    </tr>
+                @endforeach
+            @empty
+                <tr>
+                    <td colspan="5" style="text-align: center;">{{ __('لا توجد بيانات') }}</td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
+
+    <h3 class="section-title">{{ __('أكبر و أصغر سنة حكم حسب النوع') }}</h3>
+        <table>
+        <thead>
+            <tr>
+                <th>النوع</th>
+                <th>أصغر سنة حكم</th>
+                <th>أكبر سنة حكم</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($statsByType as $type => $typeData)
+                @if ($typeData['min_year'] && $typeData['max_year'])
+                    <tr>
+                        <td>{{ $type }}</td>
+                        <td>{{ $typeData['min_year'] }}</td>
+                        <td>{{ $typeData['max_year'] }}</td>
+                    </tr>
+                @endif
             @empty
                 <tr>
                     <td colspan="5" style="text-align: center;">{{ __('لا توجد بيانات') }}</td>

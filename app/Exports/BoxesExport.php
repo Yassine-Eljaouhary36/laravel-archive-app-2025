@@ -76,7 +76,7 @@ class BoxesExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSiz
     {
         return [
             $box->box_number,
-            $box->savingBase->number ?? $box->saving_base_number,
+            sprintf('="%s"', $box->savingBase->number ?? $box->saving_base_number),
             $box->file_type,
             $box->type,
             $box->tribunal->tribunal ?? '',
@@ -111,7 +111,7 @@ class BoxesExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSiz
         ]);
 
         // Data style
-        $sheet->getStyle('A2:I' . ($sheet->getHighestRow()))->applyFromArray([
+        $sheet->getStyle('A2:G' . ($sheet->getHighestRow()))->applyFromArray([
             'font' => [
                 'size' => 12
             ],
@@ -128,7 +128,7 @@ class BoxesExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSiz
         ]);
 
         // Auto-filter
-        $sheet->setAutoFilter('A1:I1');
+        $sheet->setAutoFilter('A1:G1');
 
         // Freeze first row
         $sheet->freezePane('A2');

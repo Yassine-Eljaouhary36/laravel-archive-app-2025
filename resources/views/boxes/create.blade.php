@@ -96,7 +96,7 @@
                                     <!-- Year of Judgment -->
                                     <div>
                                         <x-input-label for="year_of_judgment" :value="__('سنة الحكم')" />
-                                        <x-text-input id="year_of_judgment" class="block mt-1 w-full" type="number" name="year_of_judgment" :value="old('year_of_judgment')" readonly/>
+                                        <x-text-input id="year_of_judgment" class="block mt-1 w-full" type="number" name="year_of_judgment" :value="old('year_of_judgment')"/>
                                         <x-input-error :messages="$errors->get('year_of_judgment')" class="mt-2" />
                                     </div>
                                 </div>
@@ -134,7 +134,7 @@
                                         <!-- Symbol -->
                                         <div>
                                             <x-input-label for="symbol"  >{{__('رمز الملف')}}</x-input-label>
-                                            <x-text-input id="symbol" class="block mt-1 w-full" type="text" name="symbol" readonly/>
+                                            <x-text-input id="symbol" class="block mt-1 w-full" type="text" name="symbol"/>
                                         </div>
                                                 
                                         <!-- Year of Opening -->
@@ -148,13 +148,13 @@
                                         <!-- Judgment Number -->
                                         <div>
                                             <x-input-label for="judgment_number" :value="__('رقم الحكم')" />
-                                            <x-text-input id="judgment_number" class="block mt-1 w-full" type="text" name="judgment_number" readonly/>
+                                            <x-text-input id="judgment_number" class="block mt-1 w-full" type="text" name="judgment_number"/>
                                         </div>
                                                 
                                         <!-- Judgment Date -->
                                         <div>
                                             <x-input-label for="judgment_date" :value="__('تاريخ الحكم')" />
-                                            <x-text-input id="judgment_date" class="block mt-1 w-full" type="date" name="judgment_date" readonly/>
+                                            <x-text-input id="judgment_date" class="block mt-1 w-full" type="date" name="judgment_date"/>
                                         </div>
 
                                         <!-- Remark -->
@@ -252,7 +252,9 @@
             function resetFileForm() {
                 document.getElementById('file_number').value = '';
                 document.getElementById('symbol').value = '';
-                // document.getElementById('year_of_opening').value = '';
+                if(document.getElementById('year_of_judgment').value.trim()){
+                   document.getElementById('year_of_opening').value = ''; 
+                }
                 document.getElementById('judgment_number').value = '';
                 document.getElementById('judgment_date').value = '';
                 document.getElementById('remark').value = ''; // Add this line
@@ -309,13 +311,9 @@
                     isValid = false;
                 }
 
-                // if (!fileData.symbol) {
-                //     errorMessages.push('رمز الملف مطلوب');
-                //     isValid = false;
-                // }
 
                 if (!fileData.year_of_opening  || fileData.year_of_opening< 1900 || fileData.year_of_opening > currentYear) {
-                    errorMessages.push(`أدخل سنة صالحة بين 1900 و ${currentYear}`);
+                    errorMessages.push(`سنة فتح الملف: أدخل سنة صالحة بين 1900 و ${currentYear}`);
                     isValid = false;
                 }
                 if(yearOfJudgment){
@@ -324,6 +322,10 @@
                         isValid = false;
                     }else if (new Date(fileData.judgment_date).getFullYear() !== parseInt(yearOfJudgment)) {
                         errorMessages.push('سنة الحكم لا تطابق السنة المحددة');
+                        isValid = false;
+                    }
+                    if (!fileData.symbol) {
+                        errorMessages.push('رمز الملف مطلوب');
                         isValid = false;
                     }
                 }
@@ -631,7 +633,7 @@
                 scrollTopBtn.style.pointerEvents = isAtTop ? 'none' : 'auto';
             });
 
-            document.getElementById('fileFormContainer').addEventListener('keydown', (e) => {
+            document.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     document.getElementById('insertFileFataButton').click();
