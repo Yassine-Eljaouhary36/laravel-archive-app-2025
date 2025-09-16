@@ -127,6 +127,10 @@ Route::get('/boxes/{box}/label', [BoxController::class, 'generateBoxLabelPdf'])
     ->middleware(['auth', 'role:admin|controller'])
      ->name('boxes.label');
 
+Route::get('/qr-scanner', function () {
+    return view('boxes.Qr-scanner');
+})->name('qr-scanner');
+
 
 // Regular user dashboard (no prefix)
 Route::get('/user/dashboard', [UserDashboardController::class, 'index'])

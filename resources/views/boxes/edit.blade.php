@@ -282,6 +282,18 @@
             ];
         })) !!};
         
+        let submitting = false;
+        document.querySelector("#boxForm").addEventListener("submit", () => submitting = true);
+        window.addEventListener("beforeunload", function (e) {
+            const count = files.filter(f => !f.id).length;
+            if (count != 0 && !submitting) {
+                e.preventDefault();
+                console.log(submitting);
+                    
+                e.returnValue = "";
+            }
+        });
+            
         let editingIndex = null;
 
         function showFileForm() {
